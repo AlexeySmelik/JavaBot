@@ -26,6 +26,10 @@ public class QuestionHelper {
         return questions.get(index);
     }
 
+    public Integer getNumberOfQuestions() {
+        return questions.size();
+    }
+
     private void updateNotUsedIndexes(){
         notUsedIndexes = new ArrayList<>();
         for (var i = 0; i < questions.size(); i++)

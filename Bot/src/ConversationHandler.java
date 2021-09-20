@@ -1,33 +1,45 @@
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class ConversationHandler {
-    private static QuestionHelper dictionary;
-    public static boolean stop;
+    public static Integer SaveState = -1;
+    public static Integer EndState = -2;
 
-    public static void workItteration(){
-        dictionary = new QuestionHelper();
-        var question = dictionary.getRandomQuestion();
-        System.out.println(question.question);
+    private final ArrayList<MessageHandler> commands;
+    private final Map<Integer, MessageHandler> statements;
+    private Integer state;
 
-        Scanner sc = new Scanner(System.in);
-        var personAnswer = sc.nextLine();
-
-        getAnswer(personAnswer, question.answer);
+    public ConversationHandler(
+            ArrayList<MessageHandler> commands,
+            Map<Integer, MessageHandler> statements,
+            Integer startState) {
+        this.commands = commands;
+        this.statements = statements;
+        this.state = startState;
     }
 
-    private static void getAnswer(String personAnswer, String questionAnswer){
-        if (questionAnswer.equals(personAnswer))
+    public void doAction(Context context) {
+        var command = MessageHandler.getMessageHandler(context.lastUserMessage, commands);
+        if (command != null)
         {
-            System.out.println("Правильный ответ");
+
+            var nextState = command.action.apply(context);
+            if (!SaveState.equals(nextState)) // != SaveState
+            {
+                state = nextState;
+                if (command.hasPreAction())
+                    command.preAction.accept(context);
+            }
+            return;
         }
-        else if ("Конец".equals(personAnswer)){
-            stop = true;
-            System.out.println("Пока-пока!");
-        }
-        else{
-            System.out.println("Ответ неверный");
+
+        var message = statements.get(state);
+        var nextState = message.action.apply(context);
+        if (!SaveState.equals(nextState)) // != SaveState
+        {
+            state = nextState;
+            if (message.hasPreAction())
+                message.preAction.accept(context);
         }
     }
 }
-
-
