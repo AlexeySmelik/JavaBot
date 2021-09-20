@@ -7,9 +7,7 @@ public class MessageHandler {
     public Consumer<Context> preAction;
     private final String inText;
 
-    public MessageHandler(
-            String inText,
-            Function<Context, Integer> action) {
+    public MessageHandler(String inText, Function<Context, Integer> action) {
         this.inText = inText;
         this.action = action;
         this.preAction = null;

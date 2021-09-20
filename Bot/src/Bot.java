@@ -5,9 +5,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Bot {
-    public Context context;
-    public ConversationHandler conversationHandler;
-    public QuestionHelper questionHelper;
+    private final Context context;
+    private final QuestionHelper questionHelper;
+    private ConversationHandler conversationHandler;
 
     public Bot() {
         context = new Context();
@@ -29,31 +29,34 @@ public class Bot {
     }
 
     private void InitConvHandler() {
+        conversationHandler = new ConversationHandler(getCommands(), getStatements(), 0);
+    }
+
+    private ArrayList<MessageHandler> getCommands() {
         var commands = new ArrayList<MessageHandler>();
         commands.add(new MessageHandler("\\help", Bot::helpMethod));
         commands.add(new MessageHandler("\\start", Bot::startMethod));
-
-        var statements = new HashMap<Integer, MessageHandler>();
-        for (var i = 1; i <= questionHelper.getNumberOfQuestions(); i++) {
-            var form = questionHelper.getRandomQuestion();
-            statements.put(
-                    i,
-                    generateMessageHandler(
-                            form,
-                            i == questionHelper.getNumberOfQuestions() ?
-                                    ConversationHandler.EndState :
-                                    i
-                    )
-            );
-        }
-
-        conversationHandler = new ConversationHandler(commands, statements, 1);
+        commands.add(new MessageHandler("\\restart", Bot::restartMethod));
+        return commands;
     }
 
-    private static MessageHandler generateMessageHandler(QuestionForm form, Integer index) {
+    private HashMap<Integer, MessageHandler> getStatements() {
+        var statements = new HashMap<Integer, MessageHandler>();
+        var questions = questionHelper.getQuestions();
+        for (var i = 1; i <= questionHelper.getNumberOfQuestions(); i++)
+            statements.put(i, generateMessageHandler(questions.get(i - 1), i, questionHelper.getNumberOfQuestions()));
+        return statements;
+    }
+
+    private static MessageHandler generateMessageHandler(QuestionForm form, Integer index, Integer max) {
         Function<Context, Integer> func = (Context context) -> {
             if (context.lastUserMessage.equals(form.answer)) {
-                System.out.println("Некст");
+                if (index + 1 > max)
+                {
+                    System.out.println("Конец)0))\nПропиши \\restart, чтобы начать заново!");
+                    return ConversationHandler.EndState;
+                }
+                System.out.println("Next)0))");
                 return index + 1;
             } else {
                 System.out.println("Неправильный ответ)0))");
@@ -61,9 +64,8 @@ public class Bot {
             }
         };
 
-        Consumer<Context> cons = (Context context) -> {
+        Consumer<Context> cons = (Context context) ->
             System.out.println(form.question);
-        };
 
         return new MessageHandler(form.answer, func, cons);
     }
@@ -76,5 +78,10 @@ public class Bot {
     private static Integer helpMethod(Context context) {
         System.out.println("Норм бот!");
         return ConversationHandler.SaveState;
+    }
+
+    private static Integer restartMethod(Context context) {
+        System.out.println("Let's go!");
+        return 1;
     }
 }
