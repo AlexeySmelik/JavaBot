@@ -16,7 +16,7 @@ public class Bot {
     }
 
     public void startPolling() {
-        sendMessage("Hello... my description...");
+        sendMessage(StringStore.description);
         var sc = new Scanner(System.in);
         while (true) {
             context.lastUserMessage = sc.nextLine();
@@ -53,13 +53,13 @@ public class Bot {
             if (context.lastUserMessage.equals(form.answer)) {
                 if (index + 1 > max)
                 {
-                    System.out.println("Конец)0))\nПропиши \\restart, чтобы начать заново!");
+                    System.out.println(StringStore.end);
                     return ConversationHandler.EndState;
                 }
-                System.out.println("Next)0))");
+                System.out.println(StringStore.next);
                 return index + 1;
             } else {
-                System.out.println("Неправильный ответ)0))");
+                System.out.println(StringStore.wrongAnswer);
                 return ConversationHandler.SaveState;
             }
         };
@@ -71,17 +71,17 @@ public class Bot {
     }
 
     private static Integer startMethod(Context context) {
-        System.out.println("Go!");
+        System.out.println(StringStore.start);
         return 1;
     }
 
     private static Integer helpMethod(Context context) {
-        System.out.println("Норм бот!");
+        System.out.println(StringStore.help);
         return ConversationHandler.SaveState;
     }
 
     private static Integer restartMethod(Context context) {
-        System.out.println("Let's go!");
+        System.out.println(StringStore.restart);
         return 1;
     }
 }
