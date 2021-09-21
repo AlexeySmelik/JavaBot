@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -29,7 +30,11 @@ public class Bot {
     }
 
     private void InitConvHandler() {
-        conversationHandler = new ConversationHandler(getCommands(), getStatements(), 0);
+        try(var conv = new ConversationHandler(getCommands(), getStatements(), 0)) {
+            conversationHandler = conv;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private ArrayList<MessageHandler> getCommands() {

@@ -8,9 +8,7 @@ public class MessageHandler {
     private final String inText;
 
     public MessageHandler(String inText, Function<Context, Integer> action) {
-        this.inText = inText;
-        this.action = action;
-        this.preAction = null;
+        this(inText, action, null);
     }
 
     public MessageHandler(

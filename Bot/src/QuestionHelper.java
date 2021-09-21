@@ -4,6 +4,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// IQuestionGetter
+// get()
 public class QuestionHelper {
     private final ArrayList<QuestionForm> questions;
 
