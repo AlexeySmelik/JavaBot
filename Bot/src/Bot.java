@@ -1,11 +1,7 @@
 import data.Context;
 import handlers.ConversationHandler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Scanner;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class Bot {
     private final Context context;
