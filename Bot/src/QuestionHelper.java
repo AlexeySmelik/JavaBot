@@ -4,14 +4,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-// IQuestionGetter
-// get()
-public class QuestionHelper {
+public class QuestionHelper implements IQuestionGetter {
     private final ArrayList<QuestionForm> questions;
 
     public QuestionHelper() {
         questions = new ArrayList<>();
-        setQuestions();
+        loadQuestions();
     }
 
     public ArrayList<QuestionForm> getQuestions() {
@@ -22,7 +20,7 @@ public class QuestionHelper {
         return questions.size();
     }
 
-    private void setQuestions() {
+    private void loadQuestions() {
         var file = new File("Bot/src/res", "questions.txt");
         try(var bf = new BufferedReader(new FileReader(file))){
             for (var line : bf.lines().toList())
