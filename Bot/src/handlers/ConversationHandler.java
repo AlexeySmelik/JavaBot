@@ -1,60 +1,54 @@
 package handlers;
 
-import data.Context;
-
+import java.io.Closeable;
 import java.util.*;
 
-public class ConversationHandler implements AutoCloseable {
+public class ConversationHandler implements Handler<Context, Integer>, Closeable {
     public enum State {
         SAVE(-2), END(-1);
 
         State(final Integer stateId) { }
     }
 
-    private final ArrayList<MessageHandler> commands;
-    private final Map<Integer, MessageHandler> states;
-    private Context context;
+    private final List<MessageHandler> commands;
+    private final Map<Integer, List<MessageHandler>> states;
     private Integer state;
 
     public ConversationHandler(
-            ArrayList<MessageHandler> commands,
-            Map<Integer, MessageHandler> states,
-            Context context,
+            List<MessageHandler> commands,
+            Map<Integer, List<MessageHandler>> states,
             Integer startState
-    ) throws Exception {
+    ) {
         this.commands = commands;
-        checkCorrectStatements(states);
+        try {
+            checkCorrectStatements(states);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         this.states = states;
         this.state = startState;
-        this.context = context;
-        tryHandleMessage();
     }
 
-    /**
-     * Этот метод лучше не использовать, но если совсем никак, то ладно...
-     */
-    public void changeContext(Context context) {
-        this.context = context;
+    public ConversationHandler(
+            List<MessageHandler> commands,
+            Map<Integer, List<MessageHandler>> states,
+            MessageHandler entryHandler,
+            Context context
+    ) {
+        this.commands = commands;
+        try {
+            checkCorrectStatements(states);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        this.states = states;
+        this.state = entryHandler.apply(context);
     }
 
-    /**
-     * Можно перейти на другое состояние вручную, если ну прям вообще никак...
-     */
-    public void moveTo(Integer stateID) {
-        tryChangeState(stateID);
-    }
-
-    /**
-     * А вот этот метод я лично сам рекомендую всем и каждому)0))
-     * За вас всё сделает машина, думать не надо, просто вызвать это и произойдёт магия
-     * Pogchamp XD;
-     */
-    public void move() throws Exception {
-        if (tryExecuteCommand())
+    public void execute(Context context) {
+        if (tryExecuteCommand(context))
             return;
-        if (tryHandleMessage())
-            return;
-        throw new Exception("No such message handler");
+        tryHandleMessage(context);
     }
 
     private void tryChangeState(Integer newState) {
@@ -66,23 +60,23 @@ public class ConversationHandler implements AutoCloseable {
         }
     }
 
-    private Boolean tryExecuteCommand() {
-        for (var command : commands)
-            if (command.is(context.lastUserMessage))
-            {
-                tryChangeState(command.apply(context));
-                return true;
-            }
-
-        return false;
+    private Boolean tryExecuteCommand(Context context) {
+        return commands != null && tryHandle(commands, context);
     }
 
-    private Boolean tryHandleMessage() {
-        if (!states.containsKey(state))
-            return false;
-        var newState = states.get(state).apply(context);
-        tryChangeState(newState);
-        return true;
+    private Boolean tryHandleMessage(Context context) {
+        return states != null && states.containsKey(state) && tryHandle(states.get(state), context);
+    }
+
+    private Boolean tryHandle(List<MessageHandler> handlers, Context context) {
+        for (var handler : handlers)
+            if (handler.is(context.get("message")))
+            {
+                var newState = handler.apply(context);
+                tryChangeState(newState);
+                return true;
+            }
+        return false;
     }
 
     private void checkCorrectState(Integer state) throws Exception {
@@ -90,14 +84,15 @@ public class ConversationHandler implements AutoCloseable {
             throw new Exception("No such state");
     }
 
-    private void checkCorrectStatements(Map<Integer, MessageHandler> stats) throws Exception {
+    private void checkCorrectStatements(Map<Integer, List<MessageHandler>> stats) throws Exception {
         for (var key : stats.keySet())
             if (key <= 0)
                 throw new Exception("States ID have to be positive");
     }
 
     @Override
-    public void close() {
+    public void close() { }
 
-    }
+    @Override
+    public Integer apply(Context context) { return null; }
 }
