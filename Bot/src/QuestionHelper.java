@@ -12,12 +12,8 @@ public class QuestionHelper implements IQuestionGetter {
         loadQuestions();
     }
 
-    public ArrayList<QuestionForm> getQuestions() {
+    public ArrayList<QuestionForm> get() {
         return questions;
-    }
-
-    public Integer getNumberOfQuestions() {
-        return questions.size();
     }
 
     private void loadQuestions() {
