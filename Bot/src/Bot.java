@@ -9,7 +9,7 @@ public class Bot {
     private final Context context;
     private ConversationHandler convHandler;
     private static Integer maxQuestions = 5;
-    private static ArrayList<QuestionForm> questions = new QuestionHelper().getQuestions();
+    private static ArrayList<QuestionForm> questions = new QuestionHelper().get();
 
     public Bot() {
         var data = new HashMap<String, String>();
