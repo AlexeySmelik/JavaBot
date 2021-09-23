@@ -1,92 +1,89 @@
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import handlers.Context;
+import handlers.ConversationHandler;
+import handlers.ConversationListener;
+import handlers.MessageHandler;
+
+import java.util.*;
 
 public class Bot {
     private final Context context;
-    private final QuestionHelper questionHelper;
-    private ConversationHandler conversationHandler;
+    private ConversationHandler convHandler;
+    private static Integer maxQuestions = 5;
+    private static ArrayList<QuestionForm> questions = new QuestionHelper().getQuestions();
 
     public Bot() {
-        context = new Context();
-        questionHelper = new QuestionHelper();
-        InitConvHandler();
+        var data = new HashMap<String, String>();
+        data.put("message", "hello");
+        data.put("id", "1234");
+        data.put("correctAnswers", "0");
+        data.put("totalAnswers", "0");
+        System.out.println();
+        context = new Context(data);
+
+        var states = new HashMap<Integer, List<MessageHandler>>();
+        var firstStateList = new ArrayList<MessageHandler>();
+        var secondStateList = new ArrayList<MessageHandler>();
+        var thirdStateList = new ArrayList<MessageHandler>();
+        thirdStateList.add(new MessageHandler("restart", Bot::start));
+        states.put(3, thirdStateList);
+        secondStateList.add(new MessageHandler("Да", Bot::check));
+        secondStateList.add(new MessageHandler("Нет", Bot::check));
+        states.put(2, secondStateList);
+        firstStateList.clear();
+        firstStateList.add(new MessageHandler(" ", Bot::start));
+        firstStateList.add(new MessageHandler("", Bot::Do));
+        states.put(1, firstStateList);
+
+        try(var convHandler = new ConversationHandler(null, states, firstStateList.get(0), context)) {
+            var listener = new ConversationListener(convHandler);
+            context.manager.add("message", listener);
+        }
+    }
+
+    private static Integer Do(Context context) {
+        if(context.get("totalAnswers").equals("0"))
+        {
+            Collections.shuffle(questions);
+        }
+        System.out.println(questions.get(Integer.parseInt(context.get("totalAnswers"))).question);
+        return 2;
+    }
+    private static Integer check(Context context) {
+        if(questions.get(Integer.parseInt(context.get("totalAnswers"))).answer.equals(context.get("message")))
+        {
+            var updatedCorrectAnswers = Integer.parseInt(context.get("correctAnswers")) + 1;
+            System.out.println("Правильно");
+            context.set("correctAnswers", Integer.toString(updatedCorrectAnswers));
+        }
+        else
+        {
+            System.out.println("Ты ошибся(");
+        }
+        var updatedAnswers = Integer.parseInt(context.get("totalAnswers")) + 1;
+        context.set("totalAnswers", Integer.toString(updatedAnswers));
+        if(Integer.parseInt(context.get("totalAnswers")) >= maxQuestions)
+        {
+            System.out.println("Конец.. \nТвой результат:" +
+                    context.get("correctAnswers") +
+                    "/" +
+                    context.get("totalAnswers") +
+                    "\nНапиши restart чтобы начать заново");
+            return 3;
+        }
+        System.out.println("\nНажми Enter, чтобы перейти к следующему вопросу");
+        return 1;
+    }
+
+    private static Integer start(Context context) {
+        System.out.println("Игра начинается! \nНажми Enter, чтобы увидеть вопрос");
+        context.set("totalAnswers", "0");
+        context.set("correctAnswers", "0");
+        return 1;
     }
 
     public void startPolling() {
-        sendMessage(StringStore.description);
         var sc = new Scanner(System.in);
-        while (true) {
-            context.lastUserMessage = sc.nextLine();
-            conversationHandler.doAction(context);
-        }
-    }
-
-    public void sendMessage(String text) {
-        System.out.println(text);
-    }
-
-    private void InitConvHandler() {
-        try(var conv = new ConversationHandler(getCommands(), getStatements(), 0)) {
-            conversationHandler = conv;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private ArrayList<MessageHandler> getCommands() {
-        var commands = new ArrayList<MessageHandler>();
-        commands.add(new MessageHandler("\\help", Bot::helpMethod));
-        commands.add(new MessageHandler("\\start", Bot::startMethod));
-        commands.add(new MessageHandler("\\restart", Bot::restartMethod));
-        return commands;
-    }
-
-    private HashMap<Integer, MessageHandler> getStatements() {
-        var statements = new HashMap<Integer, MessageHandler>();
-        var questions = questionHelper.getQuestions();
-        for (var i = 1; i <= questionHelper.getNumberOfQuestions(); i++)
-            statements.put(i, generateMessageHandler(questions.get(i - 1), i, questionHelper.getNumberOfQuestions()));
-        return statements;
-    }
-
-    private static MessageHandler generateMessageHandler(QuestionForm form, Integer index, Integer max) {
-        Function<Context, Integer> func = (Context context) -> {
-            if (context.lastUserMessage.equals(form.answer)) {
-                if (index + 1 > max)
-                {
-                    System.out.println(StringStore.end);
-                    return ConversationHandler.EndState;
-                }
-                System.out.println(StringStore.next);
-                return index + 1;
-            } else {
-                System.out.println(StringStore.wrongAnswer);
-                return ConversationHandler.SaveState;
-            }
-        };
-
-        Consumer<Context> cons = (Context context) ->
-            System.out.println(form.question);
-
-        return new MessageHandler(form.answer, func, cons);
-    }
-
-    private static Integer startMethod(Context context) {
-        System.out.println(StringStore.start);
-        return 1;
-    }
-
-    private static Integer helpMethod(Context context) {
-        System.out.println(StringStore.help);
-        return ConversationHandler.SaveState;
-    }
-
-    private static Integer restartMethod(Context context) {
-        System.out.println(StringStore.restart);
-        return 1;
+        while (true)
+            context.set("message", sc.nextLine());
     }
 }
