@@ -12,7 +12,7 @@ public class Bot {
     private static ArrayList<QuestionForm> questions = new QuestionHelper().getQuestions();
 
     public Bot() {
-        var data = new HashMap<String, String>();
+        var data = new HashMap<String, Object>();
         data.put("message", "hello");
         data.put("id", "1234");
         data.put("correctAnswers", "0");
