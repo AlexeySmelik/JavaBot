@@ -62,7 +62,7 @@ public class Bot {
         {
             System.out.println("Конец..");
             System.out.println("Твой результат:"+context.CorrectAnswers.toString() + "/" + context.AnsweredQuestions.toString());
-            System.out.println("Нажми SPACE чтобы начать заново");
+            System.out.println("Напиши restart чтобы начать заново");
             return 3;
         }
         System.out.println("\nНажми Enter, чтобы перейти к следующему вопросу");
