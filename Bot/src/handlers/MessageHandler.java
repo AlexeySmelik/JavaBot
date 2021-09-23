@@ -1,5 +1,6 @@
 package handlers;
 
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -13,7 +14,8 @@ public class MessageHandler implements Handler<Context, Integer> {
     }
 
     public Boolean is(String str) {
-        return pattern.equals(str);
+        var s = str.toLowerCase(Locale.ROOT);
+        return pattern.toLowerCase(Locale.ROOT).equals(s);
         //return Pattern.matches(pattern, str);
     }
 
