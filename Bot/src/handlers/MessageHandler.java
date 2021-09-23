@@ -14,8 +14,7 @@ public class MessageHandler implements Handler<Context, Integer> {
     }
 
     public Boolean is(String str) {
-        var s = str.toLowerCase(Locale.ROOT);
-        return pattern.toLowerCase(Locale.ROOT).equals(s);
+        return pattern.equals(str);
         //return Pattern.matches(pattern, str);
     }
 
