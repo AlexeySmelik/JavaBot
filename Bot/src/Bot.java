@@ -45,7 +45,7 @@ public class Bot {
         {
             Collections.shuffle(questions);
         }
-        System.out.println(questions.get(Integer.parseInt(context.get("totalAnswers"))).question);
+        System.out.println(questions.get(Integer.parseInt(context.get("totalAnswers")).question);
         return 2;
     }
     private static Integer check(Context context) {
