@@ -14,8 +14,7 @@ public class MessageHandler implements Handler<Context, Integer> {
     }
 
     public Boolean is(String str) {
-        return pattern.equals(str);
-        //return Pattern.matches(pattern, str);
+        return Pattern.matches(pattern, str);
     }
 
     public Integer apply(Context context) {
