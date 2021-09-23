@@ -15,71 +15,69 @@ public class Bot {
         var data = new HashMap<String, String>();
         data.put("message", "hello");
         data.put("id", "1234");
+        data.put("correctAnswers", "0");
+        data.put("totalAnswers", "0");
+        System.out.println();
         context = new Context(data);
 
         var states = new HashMap<Integer, List<MessageHandler>>();
-        var list = new ArrayList<MessageHandler>();
-        var list2 = new ArrayList<MessageHandler>();
-        var list3 = new ArrayList<MessageHandler>();
-        list3.add(new MessageHandler("restart", Bot::start));
-        states.put(3, list3);
-        list2.add(new MessageHandler("Да", Bot::check));
-        list2.add(new MessageHandler("Нет", Bot::check));
-        states.put(2, list2);
-        list.clear();
-        list.add(new MessageHandler(" ", Bot::start));
-        list.add(new MessageHandler("", Bot::Do));
+        var firstStateList = new ArrayList<MessageHandler>();
+        var secondStateList = new ArrayList<MessageHandler>();
+        var thirdStateList = new ArrayList<MessageHandler>();
+        thirdStateList.add(new MessageHandler("restart", Bot::start));
+        states.put(3, thirdStateList);
+        secondStateList.add(new MessageHandler("Да", Bot::check));
+        secondStateList.add(new MessageHandler("Нет", Bot::check));
+        states.put(2, secondStateList);
+        firstStateList.clear();
+        firstStateList.add(new MessageHandler(" ", Bot::start));
+        firstStateList.add(new MessageHandler("", Bot::Do));
+        states.put(1, firstStateList);
 
-        states.put(1, list);
-
-
-        try(var convHandler = new ConversationHandler(null, states, list.get(0), context)) {
+        try(var convHandler = new ConversationHandler(null, states, firstStateList.get(0), context)) {
             var listener = new ConversationListener(convHandler);
             context.manager.add("message", listener);
         }
     }
 
     private static Integer Do(Context context) {
-        if(context.AnsweredQuestions == 0)
+        if(context.get("totalAnswers").equals("0"))
         {
             Collections.shuffle(questions);
         }
-        System.out.println(questions.get(context.AnsweredQuestions).question);
+        System.out.println(questions.get(Integer.parseInt(context.get("totalAnswers"))).question);
         return 2;
     }
     private static Integer check(Context context) {
-        if(questions.get(context.AnsweredQuestions).answer.equals(context.get("message").toLowerCase(Locale.ROOT)))
+        if(questions.get(Integer.parseInt(context.get("totalAnswers"))).answer.equals(context.get("message")))
         {
+            var updatedCorrectAnswers = Integer.parseInt(context.get("correctAnswers")) + 1;
             System.out.println("Правильно");
-            context.CorrectAnswers++;
+            context.set("correctAnswers", Integer.toString(updatedCorrectAnswers));
         }
         else
         {
             System.out.println("Ты ошибся(");
         }
-        context.AnsweredQuestions++;
-        if(context.AnsweredQuestions >= maxQuestions)
+        var updatedAnswers = Integer.parseInt(context.get("totalAnswers")) + 1;
+        context.set("totalAnswers", Integer.toString(updatedAnswers));
+        if(Integer.parseInt(context.get("totalAnswers")) >= maxQuestions)
         {
-            System.out.println("Конец..");
-            System.out.println("Твой результат:"+context.CorrectAnswers.toString() + "/" + context.AnsweredQuestions.toString());
-            System.out.println("Напиши restart чтобы начать заново");
+            System.out.println("Конец.. \nТвой результат:" +
+                    context.get("correctAnswers") +
+                    "/" +
+                    context.get("totalAnswers") +
+                    "\nНапиши restart чтобы начать заново");
             return 3;
         }
         System.out.println("\nНажми Enter, чтобы перейти к следующему вопросу");
         return 1;
     }
 
-
     private static Integer start(Context context) {
-        System.out.println("Игра начинается!");
-        System.out.println("Нажми Enter, чтобы увидеть вопрос");
-        context.AnsweredQuestions = 0;
-        context.CorrectAnswers = 0;
-        return 1;
-    }
-
-    private static Integer restart(Context context) {
-        System.out.println("Точно?");
+        System.out.println("Игра начинается! \nНажми Enter, чтобы увидеть вопрос");
+        context.set("totalAnswers", "0");
+        context.set("correctAnswers", "0");
         return 1;
     }
 
