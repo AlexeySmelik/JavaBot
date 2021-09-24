@@ -8,6 +8,7 @@ public class ConversationListener implements EventListener<Context> {
     }
 
     public void update(String eventType, Context context) {
-        handler.execute(context);
+        if (eventType.equals("message"))
+            handler.execute(context);
     }
 }
