@@ -1,59 +1,31 @@
 package handlers;
 
-import java.io.Closeable;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
-public class ConversationHandler implements Handler<Context, Integer>, Closeable {
-    public enum State {
-        SAVE(-2), END(-1);
-
-        State(final Integer stateId) { }
-    }
-
+public class ConversationHandler implements Handler<Context, Integer>, AutoCloseable {
     private final List<MessageHandler> commands;
-    private final Map<Integer, List<MessageHandler>> states;
+    private final Map<Integer, State> states;
     private Integer state;
 
-    public ConversationHandler(
-            List<MessageHandler> commands,
-            Map<Integer, List<MessageHandler>> states,
-            Integer startState
-    ) {
+    public ConversationHandler(List<MessageHandler> commands, Map<Integer, State> states, Integer startState)
+            throws Exception {
         this.commands = commands;
-        try {
-            checkCorrectStatements(states);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         this.states = states;
         this.state = startState;
-    }
-
-    public ConversationHandler(
-            List<MessageHandler> commands,
-            Map<Integer, List<MessageHandler>> states,
-            MessageHandler entryHandler,
-            Context context
-    ) {
-        this.commands = commands;
-        try {
-            checkCorrectStatements(states);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.states = states;
-        this.state = entryHandler.apply(context);
+        checkCorrectStatesId();
     }
 
     public void execute(Context context) {
         if (tryExecuteCommand(context))
             return;
-        tryHandleMessage(context);
+        handleMessage(context);
     }
 
     private void tryChangeState(Integer newState) {
         try {
-            checkCorrectState(newState);
+            if (!states.containsKey(state))
+                throw new Exception("No such state");
             state = newState;
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,8 +36,13 @@ public class ConversationHandler implements Handler<Context, Integer>, Closeable
         return commands != null && tryHandle(commands, context);
     }
 
-    private Boolean tryHandleMessage(Context context) {
-        return states != null && states.containsKey(state) && tryHandle(states.get(state), context);
+    private void handleMessage(Context context) {
+        if (states == null ||
+            !states.containsKey(state) ||
+            tryHandle(states.get(state).getHandlers(), context))
+            return;
+        var fallbackState = states.get(state).getFallback().apply(context);
+        tryChangeState(fallbackState);
     }
 
     private Boolean tryHandle(List<MessageHandler> handlers, Context context) {
@@ -79,13 +56,8 @@ public class ConversationHandler implements Handler<Context, Integer>, Closeable
         return false;
     }
 
-    private void checkCorrectState(Integer state) throws Exception {
-        if (!states.containsKey(state) && Arrays.stream(State.values()).noneMatch(state::equals))
-            throw new Exception("No such state");
-    }
-
-    private void checkCorrectStatements(Map<Integer, List<MessageHandler>> stats) throws Exception {
-        for (var key : stats.keySet())
+    private void checkCorrectStatesId() throws Exception{
+        for (var key : states.keySet())
             if (key <= 0)
                 throw new Exception("States ID have to be positive");
     }
