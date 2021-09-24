@@ -13,7 +13,9 @@ public class Context {
     public Context(Integer chat_id, Map<String, Object> data) {
         this.chat_id = chat_id;
         this.data = data;
-        manager = new ContextEventManager(new ArrayList<>(data.keySet()));
+        var operations = new ArrayList<>(data.keySet());
+        operations.add("message");
+        manager = new ContextEventManager(operations);
     }
 
     public Object get(String name) {

@@ -1,12 +1,11 @@
 package handlers;
 
-import java.util.Locale;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
 public class MessageHandler implements Handler<Context, Integer> {
     private final Function<Context, Integer> action;
-    private String pattern;
+    private final String pattern;
 
     public MessageHandler(String pattern, Function<Context, Integer> action) {
         this.pattern = pattern;
