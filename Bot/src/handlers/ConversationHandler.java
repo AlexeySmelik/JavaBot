@@ -70,7 +70,7 @@ public class ConversationHandler implements Handler<Context, Integer>, Closeable
 
     private Boolean tryHandle(List<MessageHandler> handlers, Context context) {
         for (var handler : handlers)
-            if (handler.is(context.message))
+            if (handler.is(context.getMessage()))
             {
                 var newState = handler.apply(context);
                 tryChangeState(newState);

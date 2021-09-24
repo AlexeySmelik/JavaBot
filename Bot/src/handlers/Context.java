@@ -5,13 +5,12 @@ import java.util.Map;
 
 public class Context {
     public final Integer chat_id;
-    public String message;
     public ContextEventManager manager;
 
     private final Map<String, Object> data;
+    private String message;
 
-    public Context(String message, Integer chat_id, Map<String, Object> data) {
-        this.message = message;
+    public Context(Integer chat_id, Map<String, Object> data) {
         this.chat_id = chat_id;
         this.data = data;
         manager = new ContextEventManager(new ArrayList<>(data.keySet()));
@@ -26,5 +25,14 @@ public class Context {
             return;
         data.replace(name, value);
         manager.notify(name, this);
+    }
+
+    public void changeMessage(String newMessage) {
+        message = newMessage;
+        manager.notify("message", this);
+    }
+
+    public String getMessage() {
+        return message;
     }
 }
