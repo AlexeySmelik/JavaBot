@@ -3,7 +3,7 @@ package handlers;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-public class MessageHandler implements Handler<Context, Integer> {
+public class MessageHandler {
     private final Function<Context, Integer> action;
     private final String pattern;
 
@@ -19,7 +19,4 @@ public class MessageHandler implements Handler<Context, Integer> {
     public Integer apply(Context context) {
         return action.apply(context);
     }
-
-    @Override
-    public void execute(Context context) { }
 }
