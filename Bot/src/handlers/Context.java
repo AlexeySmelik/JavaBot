@@ -1,6 +1,9 @@
 package handlers;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
 
 public class Context {
@@ -13,9 +16,9 @@ public class Context {
     public Context(Integer chat_id, Map<String, Object> data) {
         this.chat_id = chat_id;
         this.data = data;
-        var operations = new ArrayList<>(data.keySet());
-        operations.add("message");
-        manager = new ContextEventManager(operations);
+        var operations = new HashSet<>(data.keySet());
+        operations.add("updateMessage");
+        manager = new ContextEventManager(new ArrayList<>(operations));
     }
 
     public Object get(String name) {
@@ -29,9 +32,9 @@ public class Context {
         manager.notify(name, this);
     }
 
-    public void changeMessage(String newMessage) {
+    public void updateMessage(String newMessage) {
         message = newMessage;
-        manager.notify("message", this);
+        manager.notify("updateMessage", this);
     }
 
     public String getMessage() {

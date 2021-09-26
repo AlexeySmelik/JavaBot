@@ -3,7 +3,7 @@ package handlers;
 import java.util.List;
 import java.util.Map;
 
-public class ConversationHandler implements Handler<Context, Integer>, AutoCloseable {
+public class ConversationHandler implements AutoCloseable {
     private final List<MessageHandler> commands;
     private final Map<Integer, State> states;
     private Integer state;
@@ -39,10 +39,12 @@ public class ConversationHandler implements Handler<Context, Integer>, AutoClose
     private void handleMessage(Context context) {
         if (states == null ||
             !states.containsKey(state) ||
+            states.get(state).getHandlers() != null &&
             tryHandle(states.get(state).getHandlers(), context))
             return;
-        var fallbackState = states.get(state).getFallback().apply(context);
-        tryChangeState(fallbackState);
+        var fallback = states.get(state).getFallback();
+        if (fallback != null)
+            tryChangeState(fallback.apply(context));
     }
 
     private Boolean tryHandle(List<MessageHandler> handlers, Context context) {
@@ -64,7 +66,4 @@ public class ConversationHandler implements Handler<Context, Integer>, AutoClose
 
     @Override
     public void close() { }
-
-    @Override
-    public Integer apply(Context context) { return null; }
 }
