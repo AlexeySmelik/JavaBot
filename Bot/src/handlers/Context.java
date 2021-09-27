@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Context {
     public final Integer chat_id;
@@ -16,16 +17,16 @@ public class Context {
     public Context(Integer chat_id, Map<String, Object> data) {
         this.chat_id = chat_id;
         this.data = data;
-        var operations = new HashSet<>(data.keySet());
+        var operations = data == null ? new HashSet<String>() : new HashSet<>(data.keySet());
         operations.add("updateMessage");
         manager = new ContextEventManager(new ArrayList<>(operations));
     }
 
-    public Object get(String name) {
+    public Object get(@NotNull String name) {
         return data.getOrDefault(name, null);
     }
 
-    public void set(String name, Object value) {
+    public void set(@NotNull String name, Object value) {
         if (!data.containsKey(name))
             return;
         data.replace(name, value);
@@ -35,6 +36,10 @@ public class Context {
     public void updateMessage(String newMessage) {
         message = newMessage;
         manager.notify("updateMessage", this);
+    }
+
+    public Integer getChat_id() {
+        return chat_id;
     }
 
     public String getMessage() {
