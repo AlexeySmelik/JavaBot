@@ -22,11 +22,11 @@ public class Context {
         manager = new ContextEventManager(new ArrayList<>(operations));
     }
 
-    public Object get(@NotNull String name) {
+    public Object get(String name) {
         return data.getOrDefault(name, null);
     }
 
-    public void set(@NotNull String name, Object value) {
+    public void set(String name, Object value) {
         if (!data.containsKey(name))
             return;
         data.replace(name, value);
