@@ -1,3 +1,4 @@
+/*
 import handlers.Context;
 import handlers.MessageHandler;
 import handlers.State;
@@ -124,3 +125,4 @@ public class DialogMaker {
         return 7;
     }
 }
+*/

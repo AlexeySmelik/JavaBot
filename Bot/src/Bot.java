@@ -1,3 +1,4 @@
+/*
 import handlers.*;
 
 import java.util.*;
@@ -30,3 +31,4 @@ public class Bot {
             context.changeMessage(sc.nextLine().toLowerCase(Locale.ROOT));
     }
 }
+*/
