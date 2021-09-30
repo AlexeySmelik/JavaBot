@@ -1,3 +1,4 @@
+/*
 package handlers;
 
 import java.util.function.Function;
@@ -20,3 +21,4 @@ public class MessageHandler {
         return action.apply(context);
     }
 }
+*/
