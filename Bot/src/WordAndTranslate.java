@@ -13,4 +13,12 @@ public class WordAndTranslate {
     public String getTranslate(){
         return translate;
     }
+
+    @Override
+    public boolean equals(Object obj){
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        var word = (WordAndTranslate) obj;
+        return this.word.equals(word.word) && this.translate.equals(word.translate);
+    }
 }
