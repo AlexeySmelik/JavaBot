@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 public class DialogMaker {
     private static DictionaryRepositoryByTopics dictionary;
+    private static Integer maxQuestions = 2;
 
     static {
         try {
@@ -102,17 +103,18 @@ public class DialogMaker {
 
     private static Integer askTopic(Context context) {
         var message = context.getMessage().substring(0, 1).toUpperCase(Locale.ROOT) + context.getMessage().substring(1);
-        if(!((HashMap<String, LearnedWords>) context.get("learnedWords")).containsKey(message)) {
+        var learnedWords = ((HashMap<String, LearnedWords>) context.get("learnedWords"));
+        if(!learnedWords.containsKey(message)) {
             System.out.println("Нет такой темы");
             return 6;
         }
-        if(Adapter.class.cast(context.get("adapter")).GetUserQuestions(context.getMessage(), (HashMap<String, LearnedWords>) context.get("learnedWords"), 1) == null)
+        if(((Adapter) context.get("adapter")).GetUserQuestions(context.getMessage(), learnedWords, maxQuestions) == null)
         {
             System.out.println("Ты еще не учил слова");
             return 1;
         }
         context.set("topic", message);
-        context.set("questions", Adapter.class.cast(context.get("adapter")).GetUserQuestions(context.getMessage(), (HashMap<String, LearnedWords>) context.get("learnedWords"), 1));
+        context.set("questions", ((Adapter) context.get("adapter")).GetUserQuestions(context.getMessage(), learnedWords, maxQuestions));
         return askWord(context);
     }
 
@@ -125,22 +127,26 @@ public class DialogMaker {
 
 
     private static Integer checkWord(Context context) {
-        int maxQuestions = 1;
         var learned = ((HashMap<String, LearnedWords>)context.get("learnedWords"));
         var question = ((ArrayList<QuestionForm>)context.get("questions")).get((int)context.get("correctAnswers"));
+        var attempts = (Integer)context.get("attempts");
+        var learnedByTopic = learned.get((String) context.get("topic"));
+        var index = (int)context.get("correctAnswers");
+        var word = GetWordByQuestion(question, index, maxQuestions);
         if((int)context.get("correctAnswers") == 2 * maxQuestions - 1)
         {
+            var lastWord = GetWordByQuestion(question, 2 * maxQuestions - 1, maxQuestions);
             if(context.getMessage().equals(question.answer))
             {
-                if((Integer)context.get("attempts") == 0 && learned.get((String) context.get("topic")).BadlyLearnedWords.contains(GetWordByQuestion(question, 2 * maxQuestions - 1, maxQuestions)))
+                if(attempts == 0 && learnedByTopic.BadlyLearnedWords.contains(lastWord))
                 {
-                    learned.get((String) context.get("topic")).BadlyLearnedWords.remove(GetWordByQuestion(question, 2 * maxQuestions - 1, maxQuestions));
-                    learned.get((String) context.get("topic")).NormallyLearnedWords.add(GetWordByQuestion(question, 2 * maxQuestions - 1, maxQuestions));
+                    learnedByTopic.BadlyLearnedWords.remove(lastWord);
+                    learnedByTopic.NormallyLearnedWords.add(lastWord);
                 }
-                else if((Integer)context.get("attempts") == 0 && learned.get((String) context.get("topic")).NormallyLearnedWords.contains(GetWordByQuestion(question, 2 * maxQuestions - 1, maxQuestions)))
+                else if((Integer)context.get("attempts") == 0 && learnedByTopic.NormallyLearnedWords.contains(lastWord))
                 {
-                    learned.get((String) context.get("topic")).NormallyLearnedWords.remove(GetWordByQuestion(question, 2 * maxQuestions - 1, maxQuestions));
-                    learned.get((String) context.get("topic")).WellLearnedWords.add(GetWordByQuestion(question, 2 * maxQuestions - 1, maxQuestions));
+                    learnedByTopic.NormallyLearnedWords.remove(lastWord);
+                    learnedByTopic.WellLearnedWords.add(lastWord);
                 }
                 context.set("attempts", 0);
                 System.out.println("Правильно");
@@ -154,17 +160,15 @@ public class DialogMaker {
         }
         else if(context.getMessage().equals(question.answer))
         {
-            var index = (int)context.get("correctAnswers");
-            var w = GetWordByQuestion(question, index, maxQuestions);
-            if((Integer)context.get("attempts") == 0 && learned.get((String) context.get("topic")).BadlyLearnedWords.contains(GetWordByQuestion(question, index, maxQuestions)))
+            if(attempts == 0 && learnedByTopic.BadlyLearnedWords.contains(word))
             {
-                learned.get((String) context.get("topic")).BadlyLearnedWords.remove(GetWordByQuestion(question, index, maxQuestions));
-                learned.get((String) context.get("topic")).NormallyLearnedWords.add(GetWordByQuestion(question, index, maxQuestions));
+                learnedByTopic.BadlyLearnedWords.remove(word);
+                learnedByTopic.NormallyLearnedWords.add(word);
             }
-            else if((Integer)context.get("attempts") == 0 && learned.get((String) context.get("topic")).NormallyLearnedWords.contains(GetWordByQuestion(question, index, maxQuestions)))
+            else if((Integer)context.get("attempts") == 0 && learnedByTopic.NormallyLearnedWords.contains(word))
             {
-                learned.get((String) context.get("topic")).NormallyLearnedWords.remove(GetWordByQuestion(question, index, maxQuestions));
-                learned.get((String) context.get("topic")).WellLearnedWords.add(GetWordByQuestion(question, index, maxQuestions));
+                learnedByTopic.NormallyLearnedWords.remove(word);
+                learnedByTopic.WellLearnedWords.add(word);
             }
             context.set("correctAnswers", (int)context.get("correctAnswers") + 1);
             System.out.println("Правильно");
@@ -173,16 +177,15 @@ public class DialogMaker {
         }
         else
         {
-            var index = (int)context.get("correctAnswers");
-            if(learned.get((String) context.get("topic")).WellLearnedWords.contains(GetWordByQuestion(question, index, maxQuestions)))
+            if(learnedByTopic.WellLearnedWords.contains(GetWordByQuestion(question, index, maxQuestions)))
             {
-                learned.get((String) context.get("topic")).WellLearnedWords.remove(GetWordByQuestion(question, index, maxQuestions));
-                learned.get((String) context.get("topic")).NormallyLearnedWords.add(GetWordByQuestion(question, index, maxQuestions));
+                learnedByTopic.WellLearnedWords.remove(word);
+                learnedByTopic.NormallyLearnedWords.add(word);
             }
-            else if(learned.get((String) context.get("topic")).NormallyLearnedWords.contains(GetWordByQuestion(question, index, maxQuestions)))
+            else if(learnedByTopic.NormallyLearnedWords.contains(word))
             {
-                learned.get((String) context.get("topic")).NormallyLearnedWords.remove(GetWordByQuestion(question, index, maxQuestions));
-                learned.get((String) context.get("topic")).BadlyLearnedWords.add(GetWordByQuestion(question, index, maxQuestions));
+                learnedByTopic.NormallyLearnedWords.remove(word);
+                learnedByTopic.BadlyLearnedWords.add(word);
             }
             context.set("attempts", 1);
             System.out.println("Неправильно");
@@ -205,24 +208,24 @@ public class DialogMaker {
 
     private static Integer printWordsToLearn(Context context) {
         var message = context.getMessage().substring(0, 1).toUpperCase(Locale.ROOT) + context.getMessage().substring(1);
-        if(!((HashMap<String, LearnedWords>)context.get("learnedWords")).containsKey(message))
+        var learnedWords = ((HashMap<String, LearnedWords>)context.get("learnedWords"));
+        if(!learnedWords.containsKey(message))
         {
             System.out.println("Нет такой темы");
             return 7;
         }
         System.out.println("Вывожу слова по теме: " + context.getMessage());
         var newWords = 0;
-        for(var i = 0; i < dictionary.DictionaryByTopics.get(message).size() && newWords < 2; i++){
+        for(var i = 0; i < dictionary.DictionaryByTopics.get(message).size() && newWords < 2 * maxQuestions; i++){
             var word = dictionary.DictionaryByTopics.get(message).get(i);
-            if(!((HashMap<String, LearnedWords>)context.get("learnedWords")).get(message).WellLearnedWords.contains(word) &&
-                    !((HashMap<String, LearnedWords>)context.get("learnedWords")).get(message).NormallyLearnedWords.contains(word) &&
-                    !((HashMap<String, LearnedWords>)context.get("learnedWords")).get(message).BadlyLearnedWords.contains(word))
+            if(!learnedWords.get(message).WellLearnedWords.contains(word) &&
+                    !learnedWords.get(message).NormallyLearnedWords.contains(word) &&
+                    !learnedWords.get(message).BadlyLearnedWords.contains(word))
             {
-                ((HashMap<String, LearnedWords>)context.get("learnedWords")).get(message).BadlyLearnedWords.add(word);
+               learnedWords.get(message).BadlyLearnedWords.add(word);
                 System.out.println(word.getWord() + " - " + word.getTranslate());
                 newWords++;
             }
-
         }
         return 8;
     }

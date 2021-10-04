@@ -42,16 +42,19 @@ public class Adapter {
                 wordsToAsk.add(wordsByTopic.get(i));
             }
         }
-        if(wordsToAsk.size() < maxQuestions * 2){
-            return null;
-        }
+        return MakeQuestions(wordsToAsk);
+    }
+
+    private ArrayList<QuestionForm> MakeQuestions(ArrayList<WordAndTranslate> words)
+    {
+        var maxQuestions = words.size() / 2;
         var result = new ArrayList<QuestionForm>();
         for(var i = 0; i < maxQuestions; i++) {
-            var word = wordsToAsk.get(i);
+            var word = words.get(i);
             result.add(new QuestionForm(word.getWord(), word.getTranslate()));
         }
         for(var i = maxQuestions; i < 2 * maxQuestions; i++) {
-            var word = wordsToAsk.get(i);
+            var word = words.get(i);
             result.add(new QuestionForm(word.getTranslate(), word.getWord()));
         }
         return result;
