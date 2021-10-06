@@ -8,7 +8,6 @@ public class Bot {
     private final Context context;
     private ConversationHandler convHandler;
     private static Integer maxQuestions = 5;
-    private static ArrayList<QuestionForm> questions = new QuestionHelper().get();
     private static ArrayList<String> themes = new ArrayList<String>();
 
     public Bot() throws IOException {

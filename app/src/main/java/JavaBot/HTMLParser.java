@@ -17,7 +17,6 @@ public  class HTMLParser {
     private final HashSet<String> themesHashSet;
 
     public HTMLParser() throws IOException {
-        /*themeAndWords.keySet();*/
         linksArray = new ArrayList<>();
         themesArray = new ArrayList<>();
         themeAndWords = new HashMap<>();
