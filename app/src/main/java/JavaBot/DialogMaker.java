@@ -1,7 +1,4 @@
-
-import handlers.Context;
-import handlers.MessageHandler;
-import handlers.State;
+package JavaBot;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -1,7 +1,4 @@
-import handlers.Context;
-import handlers.ConversationHandler;
-import handlers.MessageHandler;
-import handlers.State;
+package JavaBot;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

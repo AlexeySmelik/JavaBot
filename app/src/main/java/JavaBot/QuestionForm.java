@@ -1,3 +1,5 @@
+package JavaBot;
+
 public class QuestionForm {
     public String question;
     public String answer;

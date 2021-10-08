@@ -1,6 +1,4 @@
-
-package handlers;
-
+package JavaBot;
 
 import java.util.ArrayList;
 import java.util.HashSet;
