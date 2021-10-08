@@ -1,5 +1,4 @@
-
-package handlers;
+package JavaBot;
 
 import java.util.List;
 import java.util.function.Function;

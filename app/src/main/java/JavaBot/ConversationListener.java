@@ -1,5 +1,4 @@
-
-package handlers;
+package JavaBot;
 
 public class ConversationListener implements EventListener<Context> {
     private final ConversationHandler handler;

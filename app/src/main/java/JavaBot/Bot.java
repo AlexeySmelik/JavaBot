@@ -1,5 +1,4 @@
-
-import handlers.*;
+package JavaBot;
 
 import java.io.IOException;
 import java.util.*;

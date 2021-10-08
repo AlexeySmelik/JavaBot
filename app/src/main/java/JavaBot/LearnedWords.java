@@ -1,3 +1,4 @@
+package JavaBot;
 import java.util.ArrayList;
 
 public class LearnedWords {

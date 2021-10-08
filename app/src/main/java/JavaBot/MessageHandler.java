@@ -1,5 +1,4 @@
-
-package handlers;
+package JavaBot;
 
 import java.util.function.Function;
 import java.util.regex.Pattern;

@@ -1,3 +1,5 @@
+package JavaBot;
+
 public class WordAndTranslate {
     private final String word;
     private final String translate;
