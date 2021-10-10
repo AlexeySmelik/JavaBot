@@ -1,15 +1,19 @@
 package JavaBot;
 
+import JavaBot.handlers.Context;
+import JavaBot.handlers.ConversationHandler;
+import JavaBot.handlers.ConversationListener;
+
 import java.io.IOException;
 import java.util.*;
 
-public class Bot {
+public class OldBot {
     private final Context context;
     private ConversationHandler convHandler;
     private static Integer maxQuestions = 5;
     private static ArrayList<String> themes = new ArrayList<String>();
 
-    public Bot() throws IOException {
+    public OldBot() throws IOException {
         System.out.println();
         var data = new HashMap<String, Object>();
         var adapter = new Adapter();

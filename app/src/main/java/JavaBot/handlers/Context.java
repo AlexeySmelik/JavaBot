@@ -1,4 +1,4 @@
-package JavaBot;
+package JavaBot.handlers;
 
 import java.util.ArrayList;
 import java.util.HashSet;
