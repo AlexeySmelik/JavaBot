@@ -1,5 +1,7 @@
 package JavaBot;
 
+import JavaBot.handlers.Context;
+
 import java.util.function.Function;
 import java.util.regex.Pattern;
 

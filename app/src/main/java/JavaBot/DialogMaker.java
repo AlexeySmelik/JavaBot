@@ -1,5 +1,8 @@
 package JavaBot;
 
+import JavaBot.handlers.Context;
+import JavaBot.handlers.State;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;

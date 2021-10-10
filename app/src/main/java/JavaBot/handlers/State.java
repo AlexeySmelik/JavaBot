@@ -1,4 +1,6 @@
-package JavaBot;
+package JavaBot.handlers;
+
+import JavaBot.MessageHandler;
 
 import java.util.List;
 import java.util.function.Function;

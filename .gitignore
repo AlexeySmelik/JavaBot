@@ -19,3 +19,10 @@ out
 
 # Ignore Gradle build output directory
 build
+
+# Security data
+app/src/main/resources/config.json
+
+# Ignore Eclipse things
+.settings
+.project
