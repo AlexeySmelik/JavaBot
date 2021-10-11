@@ -13,12 +13,12 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class DialogMaker {
-    private static DictionaryRepositoryByTopics dictionary;
+    private static WordStore dictionary;
     private static Integer maxQuestions = 2;
 
     static {
         try {
-            dictionary = new DictionaryRepositoryByTopics();
+            dictionary = new WordStore();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -225,7 +225,7 @@ public class DialogMaker {
                     !learnedWords.get(message).NormallyLearnedWords.contains(word) &&
                     !learnedWords.get(message).BadlyLearnedWords.contains(word))
             {
-               learnedWords.get(message).BadlyLearnedWords.add(word);
+                learnedWords.get(message).BadlyLearnedWords.add((WordAndTranslate) word);
                 System.out.println(word.getWord() + " - " + word.getTranslate());
                 newWords++;
             }

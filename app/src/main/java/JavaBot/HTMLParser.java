@@ -1,6 +1,5 @@
 package JavaBot;
 
-import JavaBot.resources.WordAndTranslate;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,36 +8,27 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
-public  class HTMLParser {
-    private final ArrayList<String> linksArray;
-    private final ArrayList<String> themesArray;
-    private final Map<String, ArrayList<WordAndTranslate>> themeAndWords;
-    private final HashSet<String> themesHashSet;
+public  class HTMLParser implements IParser{
+    private final HashSet<String> themesType;
 
-    public HTMLParser() throws IOException {
-        linksArray = new ArrayList<>();
-        themesArray = new ArrayList<>();
-        themeAndWords = new HashMap<>();
-        themesHashSet = new HashSet<>();
+    public HTMLParser() {
+        themesType = new HashSet<>();
     }
 
-    public Map<String, ArrayList<WordAndTranslate>> parse() throws IOException {
+    public void parse(IStore store) throws IOException {
         fillThemesHashSet();
-        getThemeAndLinks();
-        getDictionaryWithThemes();
-        return themeAndWords;
+        getThemeAndLinks(store);
     }
 
     private void fillThemesHashSet(){
-        themesHashSet.add("Автомобиль");
-        themesHashSet.add("Музыка");
+        themesType.add("Автомобиль");
+        themesType.add("Музыка");
+        themesType.add("Внешность");
     }
 
-    private void getThemeAndLinks() throws IOException {
+    private void getThemeAndLinks(IStore store) throws IOException {
         String url = "https://study-english.info/vocabularies.php";
         Document page = Jsoup.parse(new URL(url), 3000);
         Elements titles = page.select("a");
@@ -47,40 +37,32 @@ public  class HTMLParser {
             if (text.contains("Лексика по теме ")){
                 String theme = text.replace("Лексика по теме ", "");
                 theme = theme.substring(1, theme.length()-1);
-                if (themesHashSet.contains(theme)) {
-                    themesArray.add(theme);
+                if (themesType.contains(theme)) {
                     String href = "https:" + title.attr("href");
-                    linksArray.add(href);
+                    store.addT(theme, getDictionaryForTheme(href));
                 }
             }
         }
     }
 
-    private void getDictionaryWithThemes() throws IOException {
-        for (int i = 0; i < linksArray.size(); i++ ){
-            String link = linksArray.get(i);
-            String theme = themesArray.get(i);
-            ArrayList<WordAndTranslate> dictionaryForThisTheme = getDictionaryForTheme(link);
-            themeAndWords.put(theme, dictionaryForThisTheme);
-        }
-    }
-
-    private ArrayList<WordAndTranslate> getDictionaryForTheme(String link) throws IOException {
+    private ArrayList<ITuple> getDictionaryForTheme(String link) throws IOException {
         Document page = Jsoup.parse(new URL(link), 3000);
         Elements titles = page.select("tr");
-        var arrayOfWordAndTranslate = new ArrayList<WordAndTranslate>();
+        var arrayOfWordAndTranslate = new ArrayList<ITuple>();
         for (Element title : titles){
             String text = title.text();
-            if (text.contains("[") & !text.contains(",")){
+            if (text.contains("[") & !text.contains(",")
+                    & !text.contains("/") & !text.contains("(")){
                 int firstSpecialSymbol = text.indexOf("[");
                 int secondSpecialSymbol = text.indexOf("]");
-                String englishWord = text.substring(0, firstSpecialSymbol -2);
+                String englishWord = text.substring(0, firstSpecialSymbol - 1);
                 String russianWord = text.substring(secondSpecialSymbol + 2);
-                WordAndTranslate wordAndTranslate = new WordAndTranslate(englishWord, russianWord);
+                Tuple wordAndTranslate = new Tuple(englishWord, russianWord);
                 arrayOfWordAndTranslate.add(wordAndTranslate);
             }
         }
         return arrayOfWordAndTranslate;
     }
+
 
 }
