@@ -1,4 +1,6 @@
 package JavaBot;
+import JavaBot.resources.WordAndTranslate;
+
 import java.util.ArrayList;
 
 public class LearnedWords {

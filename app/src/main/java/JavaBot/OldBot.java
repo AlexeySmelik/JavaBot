@@ -1,6 +1,6 @@
 package JavaBot;
 
-import JavaBot.handlers.Context;
+import JavaBot.resources.Context;
 import JavaBot.handlers.ConversationHandler;
 import JavaBot.handlers.ConversationListener;
 
@@ -32,9 +32,10 @@ public class OldBot {
 
 
         var states = DialogMaker.MakeDialog(context);
-        try(var convHandler = new ConversationHandler(null, states, 1)) {
+        try {
+            convHandler = new ConversationHandler(null, states, 1);
             var listener = new ConversationListener(convHandler);
-            context.manager.add("updateMessage", listener);
+            context.addEventListener("message", listener);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -43,7 +44,7 @@ public class OldBot {
     public void startPolling() {
         var sc = new Scanner(System.in);
         while (true)
-            context.updateMessage(sc.nextLine().toLowerCase(Locale.ROOT));
+            context.update("message", sc.nextLine().toLowerCase(Locale.ROOT));
     }
 }
 

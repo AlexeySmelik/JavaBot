@@ -1,5 +1,7 @@
 package JavaBot;
 
+import JavaBot.db.Operator;
+import JavaBot.db.OperatorMongoDB;
 import JavaBot.resources.Config;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -12,6 +14,7 @@ import java.nio.file.Files;
 
 public class EnglishWordStudyBot extends TelegramLongPollingBot {
     private Config config;
+    private Operator operator;
 
     public EnglishWordStudyBot() {
         super();
@@ -22,8 +25,8 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
             var file = new File(configURL.toURI());
             var lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
             config = gson.fromJson(String.join("", lines), Config.class);
+            operator = new OperatorMongoDB(config);
         } catch (Exception e) {
-            config = null;
             e.printStackTrace();
         }
     }
@@ -42,6 +45,7 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             var message = new SendMessage();
+            operator.add(update.getMessage().getChatId().toString());
             message.setChatId(update.getMessage().getChatId().toString());
             message.setText(update.getMessage().getText());
 

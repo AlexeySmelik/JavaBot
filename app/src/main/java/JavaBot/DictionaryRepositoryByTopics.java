@@ -1,4 +1,6 @@
 package JavaBot;
+import JavaBot.resources.WordAndTranslate;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
