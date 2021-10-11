@@ -1,8 +1,9 @@
-package JavaBot;
+package JavaBot.resources;
 
 public class WordAndTranslate {
     private final String word;
     private final String translate;
+
     public WordAndTranslate(String word, String translate) {
         this.word = word;
         this.translate = translate;

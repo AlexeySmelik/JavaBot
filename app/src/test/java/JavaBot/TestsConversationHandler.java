@@ -1,7 +1,8 @@
 package JavaBot;
 
-import JavaBot.handlers.Context;
+import JavaBot.resources.Context;
 import JavaBot.handlers.ConversationHandler;
+import JavaBot.handlers.MessageHandler;
 import JavaBot.handlers.State;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,13 +27,13 @@ public class TestsConversationHandler {
     @Test
     public void checkPriorityCommand() throws Exception {
         var command = new MessageHandler("help", c -> {
-            c.set("nextState", 3);
+            c.update("nextState", 3);
             return 3;
         });
 
         commands.add(command);
         var handler = new MessageHandler("help", c -> {
-            c.set("nextState", 2);
+            c.update("nextState", 2);
             return 2;
         });
         var handlers = new ArrayList<MessageHandler>();
@@ -41,10 +42,11 @@ public class TestsConversationHandler {
         states.put(1, new State(handlers, null));
         var startState = 1;
         var data = new HashMap<String, Object>();
+        data.put("message", "");
         data.put("nextState", startState);
 
         var context = new Context(1, data);
-        context.updateMessage("help");
+        context.update("message", "help");
 
         initConvHandler(startState);
         convHandler.execute(context);
@@ -54,11 +56,11 @@ public class TestsConversationHandler {
     @Test
     public void checkMessageHandlerStateChange() throws Exception {
         var handler1 = new MessageHandler("abc", c -> {
-            c.set("nextState", 1);
+            c.update("nextState", 1);
             return 1;
         });
         var handler2 = new MessageHandler("abcd", c -> {
-            c.set("nextState", 2);
+            c.update("nextState", 2);
             return 2;
         });
         var handlers = new ArrayList<MessageHandler>();
@@ -72,15 +74,16 @@ public class TestsConversationHandler {
 
         var startState = 1;
         var data = new HashMap<String, Object>();
+        data.put("message", "");
         data.put("nextState", startState);
         var context = new Context(1, data);
-        context.updateMessage("abc");
+        context.update("message", "abc");
 
         initConvHandler(startState);
         convHandler.execute(context);
         Assertions.assertEquals(1, context.get("nextState"));
 
-        context.updateMessage("abcd");
+        context.update("message", "abcd");
         convHandler.execute(context);
         Assertions.assertEquals(2, context.get("nextState"));
     }
@@ -88,15 +91,15 @@ public class TestsConversationHandler {
     @Test
     public void checkFallbackStateChange() throws Exception {
         var state1 = new State(null, c -> {
-            c.set("nextState", 2);
+            c.update("nextState", 2);
             return 2;
         });
         var state2 = new State(null, c -> {
-            c.set("nextState", 3);
+            c.update("nextState", 3);
             return 3;
         });
         var state3 = new State(null, c -> {
-            c.set("nextState", 1);
+            c.update("nextState", 1);
             return 1;
         });
         states.put(1, state1);
@@ -104,6 +107,7 @@ public class TestsConversationHandler {
         states.put(3, state3);
         var data = new HashMap<String, Object>();
         var startState = 1;
+        data.put("message", "");
         data.put("nextState", startState);
         var context = new Context(1, data);
         initConvHandler(startState);
@@ -116,11 +120,12 @@ public class TestsConversationHandler {
     @Test
     public void ifNotNecessaryMessageHandlerUseFallback() throws Exception {
         var data = new HashMap<String, Object>();
+        data.put("message", "");
         data.put("cnt", 0);
         var context = new Context(1, data);
-        context.set("cnt", 0);
+        context.update("cnt", 0);
         var state = new State(null, c -> {
-            c.set("cnt", (Integer)c.get("cnt") + 54);
+            c.update("cnt", (Integer)c.get("cnt") + 54);
             return 1;
         });
         states.put(1, state);
@@ -129,7 +134,7 @@ public class TestsConversationHandler {
         convHandler.execute(context);
         Assertions.assertEquals(54, context.get("cnt"));
 
-        context.updateMessage("Lol");
+        context.update("message", "Lol");
         convHandler.execute(context);
         Assertions.assertEquals(108, context.get("cnt"));
     }

@@ -1,6 +1,6 @@
 package JavaBot.handlers;
 
-import JavaBot.MessageHandler;
+import JavaBot.resources.Context;
 
 import java.util.List;
 import java.util.function.Function;

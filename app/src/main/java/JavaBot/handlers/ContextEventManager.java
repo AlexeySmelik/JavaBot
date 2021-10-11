@@ -1,5 +1,7 @@
 package JavaBot.handlers;
 
+import JavaBot.resources.Context;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,18 +17,15 @@ public class ContextEventManager implements EventManager<Context> {
     }
 
     public void add(String eventType, EventListener<Context> listener) {
-        List<EventListener<Context>> users = listeners.get(eventType);
-        users.add(listener);
+        listeners.get(eventType).add(listener);
     }
 
     public void remove(String eventType, EventListener<Context> listener) {
-        List<EventListener<Context>> users = listeners.get(eventType);
-        users.remove(listener);
+        listeners.get(eventType).remove(listener);
     }
 
     public void notify(String eventType, Context context) {
-        List<EventListener<Context>> users = listeners.get(eventType);
-        for (EventListener<Context> listener : users)
+        for (var listener : listeners.get(eventType))
             listener.update(eventType, context);
     }
 }

@@ -1,11 +1,10 @@
 package JavaBot.handlers;
 
-import JavaBot.MessageHandler;
-
+import JavaBot.resources.Context;
 import java.util.List;
 import java.util.Map;
 
-public class ConversationHandler implements AutoCloseable {
+public class ConversationHandler {
     private final List<MessageHandler> commands;
     private final Map<Integer, State> states;
     private Integer state;
@@ -19,6 +18,11 @@ public class ConversationHandler implements AutoCloseable {
     }
 
     public void execute(Context context) {
+        try {
+            context.get("message");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (tryExecuteCommand(context))
             return;
         handleMessage(context);
@@ -51,7 +55,7 @@ public class ConversationHandler implements AutoCloseable {
 
     private Boolean tryHandle(List<MessageHandler> handlers, Context context) {
         for (var handler : handlers)
-            if (handler.is(context.getMessage()))
+            if (handler.is((String) context.get("message")))
             {
                 var newState = handler.apply(context);
                 tryChangeState(newState);
@@ -65,7 +69,4 @@ public class ConversationHandler implements AutoCloseable {
             if (key <= 0)
                 throw new Exception("States ID have to be positive");
     }
-
-    @Override
-    public void close() { }
 }
