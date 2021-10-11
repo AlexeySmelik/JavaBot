@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class Adapter {
-    private final DictionaryRepositoryByTopics dictByTopics;
+public class Adapter implements IAdapter{
+    private final WordStore dictByTopics;
 
     public Adapter() throws IOException {
-        dictByTopics = new DictionaryRepositoryByTopics();
+        dictByTopics = new WordStore();
     }
 
     public ArrayList<String> getTopics(){
@@ -42,8 +42,8 @@ public class Adapter {
             if(!learnedWords.WellLearnedWords.contains(wordsByTopic.get(i)) &&
                     !learnedWords.NormallyLearnedWords.contains(wordsByTopic.get(i)) &&
                     !learnedWords.BadlyLearnedWords.contains(wordsByTopic.get(i))){
-                learnedWords.BadlyLearnedWords.add(wordsByTopic.get(i));
-                wordsToAsk.add(wordsByTopic.get(i));
+                learnedWords.BadlyLearnedWords.add((WordAndTranslate) wordsByTopic.get(i));
+                wordsToAsk.add((WordAndTranslate) wordsByTopic.get(i));
             }
         }
         return MakeQuestions(wordsToAsk);
