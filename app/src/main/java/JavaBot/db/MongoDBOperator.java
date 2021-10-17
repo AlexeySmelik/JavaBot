@@ -1,6 +1,5 @@
 package JavaBot.db;
 
-import JavaBot.resources.Config;
 import JavaBot.resources.WordAndTranslate;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -12,17 +11,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class OperatorMongoDB implements Operator {
+public class MongoDBOperator implements Operator {
     private final MongoDatabase database;
 
-    public OperatorMongoDB(Config config) {
-        var connectionString = new ConnectionString(config.uriMongoDB);
+    public MongoDBOperator(String uri, String dbName) {
+        var connectionString = new ConnectionString(uri);
         var settings = MongoClientSettings
                 .builder()
                 .applyConnectionString(connectionString)
                 .build();
         var mongoClient = MongoClients.create(settings);
-        database = mongoClient.getDatabase(config.dbName);
+        database = mongoClient.getDatabase(dbName);
 
         try {
             database.createCollection("user_list");
