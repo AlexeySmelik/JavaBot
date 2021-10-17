@@ -1,0 +1,8 @@
+{
+  "botName" : "EnglishWordStudyBot",
+  "token" : "2054223895:AAHBYbwBenbMCFiEU-YFZ_JhvEHPUuVqg2U",
+  "uriMongoDB" : "mongodb+srv://admin:admin@englishwordcluster.rnxny.mongodb.net/test?retryWrites=true&w=majority",
+  "dbName" : "test",
+  "ibmTranslatorKey" : "yO0pk4D_TZKHWq6oD5KXWg3ZY2pFwtz6q15puCTCw2PH",
+  "ibmTranslatorUrl" : "https://api.eu-gb.language-translator.watson.cloud.ibm.com/instances/bd2f19e8-9643-4b4b-9bf9-f8eb03f7fa9c"
+}

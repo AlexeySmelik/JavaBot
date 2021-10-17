@@ -1,44 +1,31 @@
 package JavaBot;
 
 import JavaBot.db.Operator;
-import JavaBot.db.OperatorMongoDB;
-import JavaBot.resources.Config;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import com.google.gson.Gson;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 public class EnglishWordStudyBot extends TelegramLongPollingBot {
-    private Config config;
-    private Operator operator;
+    private final Operator operator;
+    private final String botToken;
+    private final String botName;
 
-    public EnglishWordStudyBot() {
+    public EnglishWordStudyBot(String botToken, String botName, Operator oper) {
         super();
-        var configURL = ClassLoader.getSystemClassLoader().getResource("config.json");
-        var gson = new Gson();
-        try {
-            assert configURL != null;
-            var file = new File(configURL.toURI());
-            var lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
-            config = gson.fromJson(String.join("", lines), Config.class);
-            operator = new OperatorMongoDB(config);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.botToken = botToken;
+        this.botName = botName;
+        operator = oper;
     }
 
     @Override
     public String getBotUsername() {
-        return config.botName;
+        return botName;
     }
 
     @Override
     public String getBotToken() {
-        return config.token;
+        return botToken;
     }
 
     @Override
