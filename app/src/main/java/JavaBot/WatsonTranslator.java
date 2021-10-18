@@ -8,10 +8,11 @@ public class WatsonTranslator implements Translator {
     LanguageTranslator languageTranslator;
 
     public WatsonTranslator(String apiKey, String url) {
-        var authenticator = new IamAuthenticator(apiKey);
+        var authenticator = new IamAuthenticator.Builder()
+                .apikey(apiKey)
+                .build();
         languageTranslator = new LanguageTranslator("2018-05-01", authenticator);
         languageTranslator.setServiceUrl(url);
-        var r = languageTranslator.listModels();
     }
 
     @Override

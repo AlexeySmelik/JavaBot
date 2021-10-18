@@ -16,11 +16,17 @@ public class Main {
     public static void main(String [] args) {
         try {
             var config = getConfig();
-            var translator = new WatsonTranslator(config.ibmTranslatorKey, config.ibmTranslatorUrl);
-            translator.translate("hello");
             var operator = new MongoDBOperator(config.uriMongoDB, config.dbName);
+            var store = new WordStore();
             var botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new EnglishWordStudyBot(config.token, config.botName, operator));
+            botsApi.registerBot(
+                    new EnglishWordStudyBot(
+                            config.token,
+                            config.botName,
+                            operator,
+                            store
+                    )
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }
