@@ -10,12 +10,14 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
     private final Operator operator;
     private final String botToken;
     private final String botName;
+    private final IStore wordStore;
 
-    public EnglishWordStudyBot(String botToken, String botName, Operator oper) {
+    public EnglishWordStudyBot(String botToken, String botName, Operator operator, IStore store) {
         super();
         this.botToken = botToken;
         this.botName = botName;
-        operator = oper;
+        this.wordStore = store;
+        this.operator = operator;
     }
 
     @Override
