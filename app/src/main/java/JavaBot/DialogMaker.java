@@ -11,32 +11,35 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class DialogMaker {
-    private static DictionaryRepositoryByTopics dictionary;
     private static Integer maxQuestions = 2;
+    private static EnglishWordStudyBot bot;
+    private static HashMap<String, ArrayList<WordAndTranslate>> dictionary = new HashMap<String, ArrayList<WordAndTranslate>>();
 
-    static {
-        try {
-            dictionary = new DictionaryRepositoryByTopics();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static HashMap<Integer, State> MakeDialog(Context context) throws IOException {
+    public static HashMap<Integer, State> MakeDialog(EnglishWordStudyBot b,Context context) throws IOException {
+        bot = b;
+        var first = new ArrayList<WordAndTranslate>();
+        first.add(new WordAndTranslate("car", "машина"));
+        first.add(new WordAndTranslate("wheel", "колесо"));
+        var second = new ArrayList<WordAndTranslate>();
+        second.add(new WordAndTranslate("milk", "молоко"));
+        second.add(new WordAndTranslate("banana", "банан"));
+        dictionary.put("Car", first);
+        dictionary.put("Food", second);
+        //bot.print(Integer.toString(dictionary.DictionaryByTopics.size()));
         var states = new HashMap<Integer, State>();
         states.put(1,
                 MakeState(
                         new HashMap<>(Map.of(
-                                "статистика", DialogMaker::printStatistic,
-                                "словарь", DialogMaker::printLearnedWords,
-                                "повторить", DialogMaker::startTest,
-                                "выучить", DialogMaker::learnWords)),
+                                "statistic", DialogMaker::printStatistic,
+                                "dictionary", DialogMaker::printLearnedWords,
+                                "revise", DialogMaker::startTest,
+                                "learn", DialogMaker::learnWords)),
                         null));
         states.put(2,
-                MakeState(new HashMap<>(Map.of("назад", DialogMaker::back)),
+                MakeState(new HashMap<>(Map.of("back", DialogMaker::back)),
                         null));
         states.put(3,
-                MakeState(new HashMap<>(Map.of("назад", DialogMaker::back)),
+                MakeState(new HashMap<>(Map.of("back", DialogMaker::back)),
                         null));
         states.put(4,
                 MakeState(new HashMap<>(), DialogMaker::askTopic));
@@ -45,18 +48,22 @@ public class DialogMaker {
         states.put(6,
                 MakeState(
                         new HashMap<>(Map.of(
-                                "заново", DialogMaker::startTest,
-                                "назад", DialogMaker::back)),
+                                "again", DialogMaker::startTest,
+                                "back", DialogMaker::back)),
                         null));
         states.put(7,
                 MakeState(new HashMap<>(), DialogMaker::printWordsToLearn));
         states.put(8,
                 MakeState(
                         new HashMap<>(Map.of(
-                                "заново", DialogMaker::learnWords,
-                                "тест", DialogMaker::startTest,
-                                "назад", DialogMaker::back)),
+                                "again", DialogMaker::learnWords,
+                                "test", DialogMaker::startTest,
+                                "back", DialogMaker::back)),
                         null));
+
+
+
+
         return states;
     }
 
@@ -72,90 +79,90 @@ public class DialogMaker {
         {
             result += e.getValue().WellLearnedWords.size();
         }
-        System.out.println("Выучено слов: " + result);
+        bot.print("Learned words: " + result);
+        bot.print("You can write: back - go to main state");
         return 2;
     }
 
     private static Integer startTest(Context context) {
         context.set("correctAnswers", 0);
         context.set("attempts", 0);
-        System.out.println("Выбери тему");
+        bot.print("Write a topic");
+        for(var i = 0; i < dictionary.keySet().toArray().length; i++){
+            bot.print(Integer.toString(i) + " - " + dictionary.keySet().toArray()[i]);
+        }
         return 4;
     }
 
     private static Integer printLearnedWords(Context context) {
-        System.out.println("Твои выученные слова:");
+        bot.print("Your learned words:");
         for(Map.Entry<String, LearnedWords> e : ((HashMap<String, LearnedWords>) context.get("learnedWords")).entrySet())
         {
             for(var i = 0; i < e.getValue().WellLearnedWords.size(); i++)
             {
-                System.out.println(e.getValue().WellLearnedWords.get(i).getWord());
+                bot.print(e.getValue().WellLearnedWords.get(i).getWord());
             }
         }
+        bot.print("You can write: back - go to main state");
         return 3;
     }
 
 
     private static Integer askWord(Context context) {
-        System.out.println(((ArrayList<QuestionForm>)context.get("questions")).get((Integer)context.get("correctAnswers")).question);
+        bot.print(((ArrayList<QuestionForm>)context.get("questions")).get((Integer)context.get("correctAnswers")).question);
         return 5;
     }
 
     private static Integer askTopic(Context context) {
-        var message = context.getMessage().substring(0, 1).toUpperCase(Locale.ROOT) + context.getMessage().substring(1);
+        var message = Integer.parseInt(context.getMessage());
         var learnedWords = ((HashMap<String, LearnedWords>) context.get("learnedWords"));
-        if(!learnedWords.containsKey(message)) {
-            System.out.println("Нет такой темы");
+        if(learnedWords.size() < message) {
+            bot.print("I don't have this topic");
+            bot.print(context.getMessage());
             return 6;
         }
-        if(((Adapter) context.get("adapter")).GetUserQuestions(context.getMessage(), learnedWords, maxQuestions) == null)
-        {
-            System.out.println("Ты еще не учил слова");
-            return 1;
-        }
-        context.set("topic", message);
-        context.set("questions", ((Adapter) context.get("adapter")).GetUserQuestions(context.getMessage(), learnedWords, maxQuestions));
+        bot.print(Integer.toString(message));
+        var topic = learnedWords.keySet().toArray()[Integer.parseInt((String) context.getMessage())].toString();
+        context.set("topic", topic);
+        var adapter = ((Adapter) context.get("adapter"));
+        context.set("questions", adapter.GetUserQuestions(topic, learnedWords, maxQuestions, dictionary));
         return askWord(context);
     }
 
-    private static WordAndTranslate GetWordByQuestion(QuestionForm question, Integer index, Integer maxQuestions){
-        if(index < maxQuestions){
-            return new WordAndTranslate(question.question, question.answer);
-        }
-        return new WordAndTranslate(question.answer, question.question);
-    }
+
 
 
     private static Integer checkWord(Context context) {
         var learned = ((HashMap<String, LearnedWords>)context.get("learnedWords"));
         var question = ((ArrayList<QuestionForm>)context.get("questions")).get((int)context.get("correctAnswers"));
         var attempts = (Integer)context.get("attempts");
-        var learnedByTopic = learned.get((String) context.get("topic"));
+        var topic = (String) context.get("topic");
+        var learnedByTopic = learned.get(topic);
         var index = (int)context.get("correctAnswers");
-        var word = GetWordByQuestion(question, index, maxQuestions);
-        if((int)context.get("correctAnswers") == 2 * maxQuestions - 1)
+        var word = new WordAndTranslate(question.answer, question.question);
+        if((int)context.get("correctAnswers") == maxQuestions - 1)
         {
-            var lastWord = GetWordByQuestion(question, 2 * maxQuestions - 1, maxQuestions);
             if(context.getMessage().equals(question.answer))
             {
-                if(attempts == 0 && learnedByTopic.BadlyLearnedWords.contains(lastWord))
+                if(attempts == 0 && learnedByTopic.BadlyLearnedWords.contains(word))
                 {
-                    learnedByTopic.BadlyLearnedWords.remove(lastWord);
-                    learnedByTopic.NormallyLearnedWords.add(lastWord);
+                    learnedByTopic.BadlyLearnedWords.remove(word);
+                    learnedByTopic.NormallyLearnedWords.add(word);
                 }
-                else if((Integer)context.get("attempts") == 0 && learnedByTopic.NormallyLearnedWords.contains(lastWord))
+                else if((Integer)context.get("attempts") == 0 && learnedByTopic.NormallyLearnedWords.contains(word))
                 {
-                    learnedByTopic.NormallyLearnedWords.remove(lastWord);
-                    learnedByTopic.WellLearnedWords.add(lastWord);
+                    learnedByTopic.NormallyLearnedWords.remove(word);
+                    learnedByTopic.WellLearnedWords.add(word);
                 }
                 context.set("attempts", 0);
-                System.out.println("Правильно");
-                System.out.println("Закончено");
+                bot.print("Correct");
+                bot.print("Finished");
+                bot.print("You can write: \nback - go to main state\nagain - learn new words");
                 return 6;
             }
             context.set("attempts", 0);
             question.UpdateHint();
-            System.out.println(question.hint);
+            bot.print(question.hint);
             return 5;
         }
         else if(context.getMessage().equals(question.answer))
@@ -171,13 +178,13 @@ public class DialogMaker {
                 learnedByTopic.WellLearnedWords.add(word);
             }
             context.set("correctAnswers", (int)context.get("correctAnswers") + 1);
-            System.out.println("Правильно");
+            bot.print("Correct");
             context.set("attempts", 0);
             return askWord(context);
         }
         else
         {
-            if(learnedByTopic.WellLearnedWords.contains(GetWordByQuestion(question, index, maxQuestions)))
+            if(learnedByTopic.WellLearnedWords.contains(word))
             {
                 learnedByTopic.WellLearnedWords.remove(word);
                 learnedByTopic.NormallyLearnedWords.add(word);
@@ -188,9 +195,9 @@ public class DialogMaker {
                 learnedByTopic.BadlyLearnedWords.add(word);
             }
             context.set("attempts", 1);
-            System.out.println("Неправильно");
+            bot.print("Wrong");
             question.UpdateHint();
-            System.out.println(question.hint);
+            bot.print(question.hint);
         }
         return 5;
     }
@@ -202,31 +209,40 @@ public class DialogMaker {
     }
 
     private static Integer learnWords(Context context) {
-        System.out.println("Напиши интересующую тематику");
+        bot.print("Write a topic");
+        for(var i = 0; i < dictionary.keySet().toArray().length; i++){
+            bot.print(Integer.toString(i) + " - " + dictionary.keySet().toArray()[i]);
+        }
         return 7;
     }
 
     private static Integer printWordsToLearn(Context context) {
-        var message = context.getMessage().substring(0, 1).toUpperCase(Locale.ROOT) + context.getMessage().substring(1);
+        var message = Integer.parseInt(context.getMessage());
         var learnedWords = ((HashMap<String, LearnedWords>)context.get("learnedWords"));
-        if(!learnedWords.containsKey(message))
+        var topic = dictionary.keySet().toArray()[message].toString();
+        if(dictionary.size() < message)
         {
-            System.out.println("Нет такой темы");
+            bot.print("I don't have this topic");
             return 7;
         }
-        System.out.println("Вывожу слова по теме: " + context.getMessage());
+
+
+        bot.print("Words from topic: " + topic);
         var newWords = 0;
-        for(var i = 0; i < dictionary.DictionaryByTopics.get(message).size() && newWords < 2 * maxQuestions; i++){
-            var word = dictionary.DictionaryByTopics.get(message).get(i);
-            if(!learnedWords.get(message).WellLearnedWords.contains(word) &&
-                    !learnedWords.get(message).NormallyLearnedWords.contains(word) &&
-                    !learnedWords.get(message).BadlyLearnedWords.contains(word))
+        for(var i = 0; i < dictionary.get(topic).size() && newWords < maxQuestions; i++){
+            var word = dictionary.get(topic).get(i);
+            if(!learnedWords.get(topic).WellLearnedWords.contains(word) &&
+                    !learnedWords.get(topic).NormallyLearnedWords.contains(word) &&
+                    !learnedWords.get(topic).BadlyLearnedWords.contains(word))
             {
-               learnedWords.get(message).BadlyLearnedWords.add(word);
-                System.out.println(word.getWord() + " - " + word.getTranslate());
+                learnedWords.get(topic).BadlyLearnedWords.add(word);
+                bot.print(word.getWord() + " - " + word.getTranslate());
                 newWords++;
             }
         }
+        bot.print("You can write: \ntest - start test to revise english words\nback - go to main state\nagain - learn some new words");
+
+
         return 8;
     }
 }
