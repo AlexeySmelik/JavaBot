@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import JavaBot.resources.WordAndTranslate;
 
 public class Adapter {
     //private final DictionaryRepositoryByTopics dictByTopics;

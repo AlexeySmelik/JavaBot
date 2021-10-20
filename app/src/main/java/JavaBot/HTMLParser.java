@@ -63,6 +63,4 @@ public  class HTMLParser implements IParser{
         }
         return arrayOfWordAndTranslate;
     }
-
-
 }
