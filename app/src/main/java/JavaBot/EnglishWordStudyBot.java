@@ -23,6 +23,14 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
         this.botName = botName;
         this.wordStore = store;
         this.operator = operator;
+        try{
+            old = new OldBot(this);
+
+        }
+        catch (Exception e)
+        {
+
+        }
     }
     public void print(String text) {
         var message = new SendMessage();
@@ -45,18 +53,12 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
         return botToken;
     }
 
+
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            var message = new SendMessage();
-            message.setChatId(update.getMessage().getChatId().toString());
-            message.setText(update.getMessage().getText());
-
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
+            ChatId = update.getMessage().getChatId().toString();
+            old.context.update("message", update.getMessage().getText());
         }
     }
 }

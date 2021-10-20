@@ -11,7 +11,7 @@ public class WordStore implements IStore{
 
     public WordStore() throws IOException {
         DictionaryByTopics = new HashMap<>();
-        IParser parser = new HTMLParser();
+        HTMLParser parser = new HTMLParser();
         parser.parse(this);
     }
 
