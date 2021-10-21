@@ -5,36 +5,33 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import com.google.gson.Gson;
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+
+import java.io.IOException;
 
 public class EnglishWordStudyBot extends TelegramLongPollingBot {
-    private final Operator operator;
+    public final Operator operatorDB;
     private final String botToken;
     private final String botName;
-    private final IStore wordStore;
+    public final WordStore wordStore;
     private OldBot old;
-    private String ChatId;
-    public EnglishWordStudyBot(String botToken, String botName, Operator operator, IStore store) {
+
+    public EnglishWordStudyBot(String botToken, String botName, Operator operator, WordStore store) {
         super();
         this.botToken = botToken;
         this.botName = botName;
         this.wordStore = store;
-        this.operator = operator;
+        this.operatorDB = operator;
         try{
             old = new OldBot(this);
-
         }
         catch (Exception e)
         {
-
         }
     }
-    public void print(String text) {
+
+    public void print(String text, String chatId) {
         var message = new SendMessage();
-        message.setChatId(ChatId);
+        message.setChatId(chatId);
         message.setText(text);
         try {
             execute(message);
@@ -57,8 +54,15 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            ChatId = update.getMessage().getChatId().toString();
-            old.context.update("message", update.getMessage().getText());
+            var chatId = update.getMessage().getChatId().toString();
+            operatorDB.add(chatId);
+            var message = update.getMessage().getText();
+            try {
+                old.tryAddNewUser(chatId);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            old.execute(chatId, message);
         }
     }
 }

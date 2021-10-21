@@ -5,48 +5,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+
+import JavaBot.db.Operator;
 import JavaBot.resources.WordAndTranslate;
 
 public class Adapter {
-    //private final DictionaryRepositoryByTopics dictByTopics;
-    public ArrayList<String> getTopics(){
-        var res = new ArrayList<String>();
-        res.add("Car");
-        res.add("Food");
-        return res;
-    }
 
-
-
-
-
-    public ArrayList<QuestionForm> GetUserQuestions(String topic, HashMap<String, LearnedWords> learned, Integer maxQuestions, HashMap<String, ArrayList<WordAndTranslate>> dictByTopics) {
-        topic = topic.toLowerCase(Locale.ROOT);
-        topic = topic.substring(0, 1).toUpperCase() + topic.substring(1);
-        var learnedWords = learned.get(topic);
+    public ArrayList<QuestionForm> GetUserQuestions(Integer maxQuestions, ArrayList<WordAndTranslate> showedWords, String userId, WordStore wordStore, Operator operatorDb, String topic) {
         var wordsToAsk = new ArrayList<WordAndTranslate>();
-        if(learnedWords == null || learnedWords.BadlyLearnedWords.size() == 0 && learnedWords.NormallyLearnedWords.size() == 0 && learnedWords.WellLearnedWords.size() == 0){
-            return null;
+        for(var i = 0; i < showedWords.size() && wordsToAsk.size() < maxQuestions; i++) {
+            wordsToAsk.add(new WordAndTranslate(showedWords.get(i).getWord(), showedWords.get(i).getTranslate()));
         }
-        if(learnedWords.BadlyLearnedWords != null){
-            for(var i = 0; i < learnedWords.BadlyLearnedWords.size() && wordsToAsk.size() < maxQuestions; i++) {
-                wordsToAsk.add(learnedWords.BadlyLearnedWords.get(i));
-            }
-        }
-
-        if(learnedWords.NormallyLearnedWords != null){
-            for(var i = 0; i < learnedWords.NormallyLearnedWords.size() && wordsToAsk.size() < maxQuestions; i++) {
-                wordsToAsk.add(learnedWords.NormallyLearnedWords.get(i));
-            }
-        }
-
-        var wordsByTopic = dictByTopics.get(topic);
-        for(var i = 0; i < wordsByTopic.size() && wordsToAsk.size() < maxQuestions; i++) {
-            if(!learnedWords.WellLearnedWords.contains(wordsByTopic.get(i)) &&
-                    !learnedWords.NormallyLearnedWords.contains(wordsByTopic.get(i)) &&
-                    !learnedWords.BadlyLearnedWords.contains(wordsByTopic.get(i))){
-                learnedWords.BadlyLearnedWords.add(wordsByTopic.get(i));
-                wordsToAsk.add(wordsByTopic.get(i));
+        for(var i = 0; i < wordStore.get(topic).size() && wordsToAsk.size() < maxQuestions; i++){
+            var word = new WordAndTranslate(wordStore.get(topic).get(i).getWord(), wordStore.get(topic).get(i).getTranslate());
+            if(!operatorDb.getWords(userId).contains(word)){
+                wordsToAsk.add(word);
             }
         }
         return MakeQuestions(wordsToAsk);
