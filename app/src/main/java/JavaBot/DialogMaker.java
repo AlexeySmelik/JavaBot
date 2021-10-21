@@ -2,10 +2,8 @@ package JavaBot;
 
 import JavaBot.handlers.State;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import JavaBot.resources.WordAndTranslate;
 import JavaBot.resources.Context;
@@ -15,19 +13,9 @@ import JavaBot.handlers.MessageHandler;
 public class DialogMaker {
     private static Integer maxQuestions = 2;
     private static EnglishWordStudyBot bot;
-    private static HashMap<String, ArrayList<WordAndTranslate>> dictionary = new HashMap<String, ArrayList<WordAndTranslate>>();
 
-    public static HashMap<Integer, State> MakeDialog(EnglishWordStudyBot b,Context context) throws IOException {
-        bot = b;
-        var first = new ArrayList<WordAndTranslate>();
-        first.add(new WordAndTranslate("car", "машина"));
-        first.add(new WordAndTranslate("wheel", "колесо"));
-        var second = new ArrayList<WordAndTranslate>();
-        second.add(new WordAndTranslate("milk", "молоко"));
-        second.add(new WordAndTranslate("banana", "банан"));
-        dictionary.put("Car", first);
-        dictionary.put("Food", second);
-        //bot.print(Integer.toString(dictionary.DictionaryByTopics.size()));
+    public static HashMap<Integer, State> MakeDialog(EnglishWordStudyBot bot) {
+        DialogMaker.bot = bot;
         var states = new HashMap<Integer, State>();
         states.put(1,
                 MakeState(
@@ -62,10 +50,6 @@ public class DialogMaker {
                                 "test", DialogMaker::startTest,
                                 "back", DialogMaker::back)),
                         null));
-
-
-
-
         return states;
     }
 
@@ -76,130 +60,134 @@ public class DialogMaker {
     }
 
     private static Integer printStatistic(Context context) {
-        var result = 0;
-        for(Map.Entry<String, LearnedWords> e : ((HashMap<String, LearnedWords>) context.get("learnedWords")).entrySet())
-        {
-            result += e.getValue().WellLearnedWords.size();
-        }
-        bot.print("Learned words: " + result);
-        bot.print("You can write: back - go to main state");
+        var chatId = (String) context.get("chatId");
+        var result = bot.operatorDB.getWords(chatId).size();
+        bot.print("Learned words: " + result, chatId);
+        bot.print("You can write: back - go to main state", chatId);
         return 2;
     }
 
     private static Integer startTest(Context context) {
         context.update("correctAnswers", 0);
         context.update("attempts", 0);
-        bot.print("Write a topic");
-        for(var i = 0; i < dictionary.keySet().toArray().length; i++){
-            bot.print(Integer.toString(i) + " - " + dictionary.keySet().toArray()[i]);
-        }
-        return 4;
+        var adapter = (Adapter)context.get("adapter");
+        var chatId = (String) context.get("chatId");
+        context.update("questions", adapter.GetUserQuestions(maxQuestions, (ArrayList<WordAndTranslate>)context.get("showedWords"), chatId, bot.wordStore, bot.operatorDB, (String)context.get("topic") ));
+
+        return askWord(context);
     }
 
     private static Integer printLearnedWords(Context context) {
-        bot.print("Your learned words:");
-        for(Map.Entry<String, LearnedWords> e : ((HashMap<String, LearnedWords>) context.get("learnedWords")).entrySet())
-        {
-            for(var i = 0; i < e.getValue().WellLearnedWords.size(); i++)
-            {
-                bot.print(e.getValue().WellLearnedWords.get(i).getWord());
-            }
-        }
-        bot.print("You can write: back - go to main state");
+        var chatId = (String) context.get("chatId");
+        bot.print("Your learned words:", chatId);
+        for(var word : bot.operatorDB.getWords(chatId))
+            bot.print(word.getWord(), chatId);
+        bot.print("You can write: back - go to main state", chatId);
         return 3;
     }
 
 
     private static Integer askWord(Context context) {
-        bot.print(((ArrayList<QuestionForm>)context.get("questions")).get((Integer)context.get("correctAnswers")).question);
+        var chatId = (String) context.get("chatId");
+        bot.print("Here", chatId);
+        bot.print(((ArrayList<QuestionForm>)context.get("questions")).get((Integer)context.get("correctAnswers")).question, chatId);
         return 5;
     }
 
     private static Integer askTopic(Context context) {
+        var chatId = (String) context.get("chatId");
         var message = Integer.parseInt((String) context.get("message"));
-        var learnedWords = ((HashMap<String, LearnedWords>) context.get("learnedWords"));
-        if(learnedWords.size() < message) {
-            bot.print("I don't have this topic");
-            bot.print((String) context.get("message"));
+        if(bot.wordStore.getTopicsName().size() < message) {
+            bot.print("I don't have this topic", chatId);
+            bot.print((String) context.get("message"), chatId);
             return 6;
         }
-        bot.print(Integer.toString(message));
-        var topic = learnedWords.keySet().toArray()[Integer.parseInt((String) context.get("message"))].toString();
+        bot.print(Integer.toString(message), chatId);
+        var topic = bot.wordStore.getTopicsName().toArray()[Integer.parseInt((String) context.get("message"))].toString();
         context.update("topic", topic);
         var adapter = ((Adapter) context.get("adapter"));
-        context.update("questions", adapter.GetUserQuestions(topic, learnedWords, maxQuestions, dictionary));
+        for(var e : (ArrayList<WordAndTranslate>)context.get("showedWords")){
+            bot.print(e.getWord(), chatId);
+        }
+        //context.update("questions", adapter.GetUserQuestions(maxQuestions, (ArrayList<WordAndTranslate>)context.get("showedWords"), chatId));
         return askWord(context);
     }
 
-
-
+    public static Integer Help(Context context){
+        var chatId = (String) context.get("chatId");
+        bot.print("In main state you can write these messages: \nstatistic - print statistic of your learned words \ndictionary - print all your learned words \nlearn - show you new english words \nrevise - start a test to revise words which have been shown earlier", chatId);
+        return 1;
+    }
 
     private static Integer checkWord(Context context) {
-        var learned = ((HashMap<String, LearnedWords>)context.get("learnedWords"));
+        var chatId = (String) context.get("chatId");
         var question = ((ArrayList<QuestionForm>)context.get("questions")).get((int)context.get("correctAnswers"));
         var attempts = (Integer)context.get("attempts");
         var topic = (String) context.get("topic");
-        var learnedByTopic = learned.get(topic);
+        var learnedByTopic = new ArrayList<WordAndTranslate>();
+        for(var e : bot.operatorDB.getWords(chatId)){
+            if(bot.wordStore.get(topic).contains(e)){
+                learnedByTopic.add(e);
+            }
+        }
         var index = (int)context.get("correctAnswers");
         var word = new WordAndTranslate(question.answer, question.question);
+        var showed = (ArrayList<WordAndTranslate>)context.get("showedWords");
         if((int)context.get("correctAnswers") == maxQuestions - 1)
         {
             if(((String) context.get("message")).equals(question.answer))
             {
-                if(attempts == 0 && learnedByTopic.BadlyLearnedWords.contains(word))
+                if(attempts == 0)
                 {
-                    learnedByTopic.BadlyLearnedWords.remove(word);
-                    learnedByTopic.NormallyLearnedWords.add(word);
-                }
-                else if((Integer)context.get("attempts") == 0 && learnedByTopic.NormallyLearnedWords.contains(word))
-                {
-                    learnedByTopic.NormallyLearnedWords.remove(word);
-                    learnedByTopic.WellLearnedWords.add(word);
+                    var list = new ArrayList<WordAndTranslate>();
+                    list.add(word);
+                    bot.operatorDB.updateWords(chatId, list);
+                    if(showed.contains(word)){
+                        showed.remove(word);
+                    }
                 }
                 context.update("attempts", 0);
-                bot.print("Correct");
-                bot.print("Finished");
-                bot.print("You can write: \nback - go to main state\nagain - learn new words");
+                bot.print("Correct", chatId);
+                bot.print("Finished", chatId);
+                bot.print("You can write: \nback - go to main state\nagain - learn new words", chatId);
                 return 6;
             }
             context.update("attempts", 0);
             question.UpdateHint();
-            bot.print(question.hint);
+            bot.print(question.hint, chatId);
             return 5;
         }
         else if(((String) context.get("message")).equals(question.answer))
         {
-            if(attempts == 0 && learnedByTopic.BadlyLearnedWords.contains(word))
+            if(attempts == 0)
             {
-                learnedByTopic.BadlyLearnedWords.remove(word);
-                learnedByTopic.NormallyLearnedWords.add(word);
-            }
-            else if((Integer)context.get("attempts") == 0 && learnedByTopic.NormallyLearnedWords.contains(word))
-            {
-                learnedByTopic.NormallyLearnedWords.remove(word);
-                learnedByTopic.WellLearnedWords.add(word);
+                var list = new ArrayList<WordAndTranslate>();
+                list.add(word);
+                bot.operatorDB.updateWords(chatId, list);
+                if(showed.contains(word)){
+                    showed.remove(word);
+                }
             }
             context.update("correctAnswers", (int)context.get("correctAnswers") + 1);
-            bot.print("Correct");
+            bot.print("Correct", chatId);
             context.update("attempts", 0);
             return askWord(context);
         }
         else
         {
-            if(learnedByTopic.WellLearnedWords.contains(word))
+            if(attempts == 0)
             {
-                learnedByTopic.WellLearnedWords.remove(word);
-                learnedByTopic.NormallyLearnedWords.add(word);
-            }
-            else if(learnedByTopic.NormallyLearnedWords.contains(word))
-            {
-                learnedByTopic.NormallyLearnedWords.remove(word);
-                learnedByTopic.BadlyLearnedWords.add(word);
+                var list = new ArrayList<WordAndTranslate>();
+                list.add(word);
+                bot.operatorDB.updateWords(chatId, list);
+                if(showed.contains(word)){
+                    showed.remove(word);
+                }
             }
             context.update("attempts", 1);
-            bot.print("Wrong");
+            bot.print("Wrong", chatId);
             question.UpdateHint();
-            bot.print(question.hint);
+            bot.print(question.hint, chatId);
         }
         return 5;
     }
@@ -211,40 +199,42 @@ public class DialogMaker {
     }
 
     private static Integer learnWords(Context context) {
-        bot.print("Write a topic");
-        for(var i = 0; i < dictionary.keySet().toArray().length; i++){
-            bot.print(Integer.toString(i) + " - " + dictionary.keySet().toArray()[i]);
+        var chatId = (String) context.get("chatId");
+        bot.print("Write a topic", chatId);
+        var idx = 0;
+        for (var topic : bot.wordStore.getTopicsName()) {
+            bot.print(idx + " - " + topic, chatId);
+            idx += 1;
         }
         return 7;
     }
 
     private static Integer printWordsToLearn(Context context) {
+        var chatId = (String) context.get("chatId");
         var message = Integer.parseInt((String) context.get("message"));
-        var learnedWords = ((HashMap<String, LearnedWords>)context.get("learnedWords"));
-        var topic = dictionary.keySet().toArray()[message].toString();
-        if(dictionary.size() < message)
+        var topic = bot.wordStore.getTopicsName().get(message); // TODO
+        if(bot.wordStore.getTopicsName().size() < message)
         {
-            bot.print("I don't have this topic");
+            bot.print("I don't have this topic", chatId);
             return 7;
         }
 
 
-        bot.print("Words from topic: " + topic);
-        var newWords = 0;
-        for(var i = 0; i < dictionary.get(topic).size() && newWords < maxQuestions; i++){
-            var word = dictionary.get(topic).get(i);
-            if(!learnedWords.get(topic).WellLearnedWords.contains(word) &&
-                    !learnedWords.get(topic).NormallyLearnedWords.contains(word) &&
-                    !learnedWords.get(topic).BadlyLearnedWords.contains(word))
-            {
-                learnedWords.get(topic).BadlyLearnedWords.add(word);
-                bot.print(word.getWord() + " - " + word.getTranslate());
-                newWords++;
+        bot.print("Words from topic: " + topic, chatId);
+        var newWords = new ArrayList<WordAndTranslate>();
+        for(var i = 0; i < bot.wordStore.get(topic).size() && newWords.size() < maxQuestions; i++){
+            var tuple = bot.wordStore.get(topic).get(i);
+            var word = new WordAndTranslate(tuple.getWord(), tuple.getTranslate());
+            if(!bot.operatorDB.getWords(chatId).contains(word)){
+                newWords.add(word);
             }
         }
-        bot.print("You can write: \ntest - start test to revise english words\nback - go to main state\nagain - learn some new words");
-
-
+        for(var e : newWords){
+            bot.print(e.getWord() + " - " + e.getTranslate(), chatId);
+        }
+        context.update("showedWords", newWords);
+        context.update("topic", topic);
+        bot.print("You can write: \ntest - start test to revise english words\nback - go to main state\nagain - learn some new words", chatId);
         return 8;
     }
 }

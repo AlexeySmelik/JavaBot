@@ -28,9 +28,9 @@ public class MongoDBOperator implements Operator {
         } catch (Exception ignored) { }
     }
 
-    public void add(String user_id) {
+    public void add(String userId) {
         var userCollection = database.getCollection("user_list");
-        var doc = new Document(Map.of("_id", user_id, "words", List.of()));
+        var doc = new Document(Map.of("_id", userId, "words", List.of()));
         try {
             userCollection.insertOne(doc);
         } catch (Exception e) {
@@ -38,9 +38,9 @@ public class MongoDBOperator implements Operator {
         }
     }
 
-    public List<WordAndTranslate> getWords(String user_id) {
+    public List<WordAndTranslate> getWords(String userId) {
         var userCollection = database.getCollection("user_list");
-        var filterDoc = new Document("_id", new Document("$regex", user_id));
+        var filterDoc = new Document("_id", new Document("$regex", userId));
         var neededDoc = userCollection.find(filterDoc).first();
         if (neededDoc == null)
             return null;
@@ -48,10 +48,10 @@ public class MongoDBOperator implements Operator {
         return res.stream().map(EnglishConverter::ToCouple).toList();
     }
 
-    public void updateWords(String user_id, List<WordAndTranslate> newWords) {
+    public void updateWords(String userId, List<WordAndTranslate> newWords) {
         var userCollection = database.getCollection("user_list");
-        var filterDoc = new Document("_id", new Document("$regex", user_id));
-        var wordStream = Stream.concat(getWords(user_id).stream(), newWords.stream());
+        var filterDoc = new Document("_id", new Document("$regex", userId));
+        var wordStream = Stream.concat(getWords(userId).stream(), newWords.stream());
         var newDoc = new Document(
                 Map.of("$set", new Document("words", wordStream.map(EnglishConverter::ToString).toList()))
         );

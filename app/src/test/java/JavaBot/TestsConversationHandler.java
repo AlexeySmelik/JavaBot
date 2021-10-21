@@ -45,7 +45,7 @@ public class TestsConversationHandler {
         data.put("message", "");
         data.put("nextState", startState);
 
-        var context = new Context(1, data);
+        var context = new Context(data);
         context.update("message", "help");
 
         initConvHandler(startState);
@@ -76,7 +76,7 @@ public class TestsConversationHandler {
         var data = new HashMap<String, Object>();
         data.put("message", "");
         data.put("nextState", startState);
-        var context = new Context(1, data);
+        var context = new Context(data);
         context.update("message", "abc");
 
         initConvHandler(startState);
@@ -109,7 +109,7 @@ public class TestsConversationHandler {
         var startState = 1;
         data.put("message", "");
         data.put("nextState", startState);
-        var context = new Context(1, data);
+        var context = new Context(data);
         initConvHandler(startState);
         for (var i = 1; i < 4; i++) {
             convHandler.execute(context);
@@ -122,7 +122,7 @@ public class TestsConversationHandler {
         var data = new HashMap<String, Object>();
         data.put("message", "");
         data.put("cnt", 0);
-        var context = new Context(1, data);
+        var context = new Context(data);
         context.update("cnt", 0);
         var state = new State(null, c -> {
             c.update("cnt", (Integer)c.get("cnt") + 54);

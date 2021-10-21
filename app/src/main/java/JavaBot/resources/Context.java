@@ -9,13 +9,10 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class Context {
-    public final Integer id;
-
     private final EventManager<Context> manager;
     private final Map<String, Object> data;
 
-    public Context(Integer id, Map<String, Object> data) {
-        this.id = id;
+    public Context(Map<String, Object> data) {
         this.data = data;
         var operations = data == null ? new HashSet<String>() : new HashSet<>(data.keySet());
         manager = new ContextEventManager(new ArrayList<>(operations));

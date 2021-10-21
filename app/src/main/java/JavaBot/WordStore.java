@@ -1,31 +1,31 @@
 package JavaBot;
-import JavaBot.resources.WordAndTranslate;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
-public class WordStore implements IStore{
-    public HashMap<String, ArrayList<ITuple>> DictionaryByTopics;
+public class WordStore implements IStore {
+    private final HashMap<String, ArrayList<ITuple>> topics;
+    private final ArrayList<String> topicsName;
 
     public WordStore() throws IOException {
-        DictionaryByTopics = new HashMap<>();
+        topics = new HashMap<>();
         HTMLParser parser = new HTMLParser();
         parser.parse(this);
+        topicsName = new ArrayList<>(topics.keySet());
     }
 
-    public ArrayList<String> getTopics(){
-        return new ArrayList<>(DictionaryByTopics.keySet());
+    public ArrayList<String> getTopicsName(){
+        return topicsName;
     }
 
     @Override
-    public IStore get() {
-        return null;
+    public ArrayList<ITuple> get(String topicName) {
+        return topics.get(topicName);
     }
 
     @Override
     public void addT(String theme, ArrayList<ITuple> tuple) {
-        DictionaryByTopics.put(theme, tuple);
+        topics.put(theme, tuple);
     }
 }
