@@ -4,9 +4,16 @@ import JavaBot.db.Operator;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EnglishWordStudyBot extends TelegramLongPollingBot {
     public final Operator operatorDB;
@@ -26,13 +33,25 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
         }
         catch (Exception e)
         {
+            e.printStackTrace();
         }
     }
 
     public void print(String text, String chatId) {
+
         var message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);
+        var markupInline = new ReplyKeyboardMarkup();
+        var rows = new ArrayList<KeyboardRow>();
+        var row = new KeyboardRow();
+        var button = new KeyboardButton();
+        button.setText("help");
+        row.add(button);
+        rows.add(row);
+        markupInline.setKeyboard(rows);
+        message.setReplyMarkup(markupInline);
+
         try {
             execute(message);
         } catch (TelegramApiException e) {

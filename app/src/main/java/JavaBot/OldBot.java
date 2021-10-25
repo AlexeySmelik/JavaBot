@@ -30,9 +30,11 @@ public class OldBot {
         users.put(chatId, context);
 
         var commands = new ArrayList<MessageHandler>();
-        commands.add(new MessageHandler("/help", DialogMaker::Help)); //TODO
+        commands.add(new MessageHandler("/help", DialogMaker::help));
+        commands.add(new MessageHandler("help", DialogMaker::help));
+        commands.add(new MessageHandler("/start", DialogMaker::help));
         try {
-            var states = DialogMaker.MakeDialog(bot);
+            var states = DialogMaker.makeDialog(bot);
             var convHandler = new ConversationHandler(commands, states, 1);
             var listener = new ConversationListener(convHandler);
             context.addEventListener("message", listener);
