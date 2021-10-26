@@ -158,8 +158,10 @@ public class DialogMaker {
     }
 
 
-
     private static Integer back(Context context) {
+        var chatId = (String) context.get("chatId");
+        bot.print("You are in main state, bro...", chatId);
+
         return 1;
     }
 
@@ -186,8 +188,7 @@ public class DialogMaker {
         bot.print("Words from topic: " + topic, chatId);
         var newWords = new ArrayList<WordAndTranslate>();
         for(var i = 0; i < bot.wordStore.get(topic).size() && newWords.size() < maxQuestions; i++){
-            var tuple = bot.wordStore.get(topic).get(i);
-            var word = new WordAndTranslate(tuple.getWord(), tuple.getTranslate());
+            var word = bot.wordStore.get(topic).get(i);
             if(!bot.operatorDB.getWords(chatId).contains(word)){
                 newWords.add(word);
             }

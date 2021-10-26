@@ -28,7 +28,7 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
         this.botName = botName;
         this.wordStore = store;
         this.operatorDB = operator;
-        try{
+        try {
             old = new OldBot(this);
         }
         catch (Exception e)
@@ -38,7 +38,6 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
     }
 
     public void print(String text, String chatId) {
-
         var message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);
