@@ -1,11 +1,13 @@
 package JavaBot;
 
+import JavaBot.resources.WordAndTranslate;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class WordStore implements IStore {
-    private final HashMap<String, ArrayList<ITuple>> topics;
+public class WordStore implements Store {
+    private final HashMap<String, ArrayList<WordAndTranslate>> topics;
     private final ArrayList<String> topicsName;
 
     public WordStore() throws IOException {
@@ -20,12 +22,12 @@ public class WordStore implements IStore {
     }
 
     @Override
-    public ArrayList<ITuple> get(String topicName) {
+    public ArrayList<WordAndTranslate> get(String topicName) {
         return topics.get(topicName);
     }
 
     @Override
-    public void addT(String theme, ArrayList<ITuple> tuple) {
+    public void addT(String theme, ArrayList<WordAndTranslate> tuple) {
         topics.put(theme, tuple);
     }
 }
