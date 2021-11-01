@@ -5,6 +5,5 @@ public class Config {
     public String token;
     public String uriMongoDB;
     public String dbName;
-    public String ibmTranslatorKey;
-    public String ibmTranslatorUrl;
+    public String extKey;
 }

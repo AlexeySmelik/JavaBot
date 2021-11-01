@@ -11,14 +11,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public  class HTMLParser implements Parser {
+public  class HTMLParser implements Loader {
     private final HashSet<String> themesType;
 
     public HTMLParser() {
         themesType = new HashSet<>();
     }
 
-    public void parse(Store store) throws IOException {
+    @Override
+    public void load(Store store) throws IOException {
         fillThemesHashSet();
         getThemeAndLinks(store);
     }
@@ -40,7 +41,7 @@ public  class HTMLParser implements Parser {
                 theme = theme.substring(1, theme.length()-1);
                 if (themesType.contains(theme)) {
                     String href = "https:" + title.attr("href");
-                    store.addT(theme, getDictionaryForTheme(href));
+                    store.add(theme, getDictionaryForTheme(href));
                 }
             }
         }

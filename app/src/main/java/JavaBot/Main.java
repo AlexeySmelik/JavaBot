@@ -16,6 +16,12 @@ public class Main {
     public static void main(String [] args) {
         try {
             var config = getConfig();
+
+            /* Это для того, чтобы дебажить(delete comments)
+            var s = new WordStore();
+            var a = new WordSimilarityLoader(config.extKey);
+            a.load(s);
+            */
             var operator = new MongoDBOperator(config.uriMongoDB, config.dbName);
             var store = new WordStore();
             var botsApi = new TelegramBotsApi(DefaultBotSession.class);
