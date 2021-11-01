@@ -6,6 +6,6 @@ import java.util.ArrayList;
 
 public interface Store {
     ArrayList<WordAndTranslate> get(String name);
-    void addT(String topic, ArrayList<WordAndTranslate> tuple);
-    ArrayList<String> getTopicsName();
+    void add(String topic, ArrayList<WordAndTranslate> tuple);
+    ArrayList<String> getTopics();
 }

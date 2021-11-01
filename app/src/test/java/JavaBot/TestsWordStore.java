@@ -10,7 +10,7 @@ public class TestsWordStore {
     @Test
     public void checkWordStoreGetDict() throws IOException {
         var wordStore = new WordStore();
-        var topics = wordStore.getTopicsName();
+        var topics = wordStore.getTopics();
 
         Assertions.assertEquals(3, topics.size());
         Assertions.assertEquals(72, wordStore.get(topics.get(0)).size());

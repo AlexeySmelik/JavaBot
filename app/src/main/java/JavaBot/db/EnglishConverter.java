@@ -4,11 +4,9 @@ import JavaBot.resources.WordAndTranslate;
 
 public class EnglishConverter {
     public static String ToString(WordAndTranslate couple) {
-        var res = new StringBuilder();
-        res.append(couple.getWord());
-        res.append(':');
-        res.append(couple.getTranslate());
-        return res.toString();
+        return couple.getWord() +
+                ':' +
+                couple.getTranslate();
     }
 
     public static WordAndTranslate ToCouple(String str) {

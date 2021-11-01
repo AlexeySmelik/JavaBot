@@ -18,6 +18,12 @@ public class TestsConversationHandler {
     private List<MessageHandler> commands;
     private Map<Integer, State> states;
 
+    // todo Mock
+
+    // IDo { int Do(); }
+
+    // Mock<IDo>.Setup(x => x.Do()).Returns(42);
+
     @BeforeEach
     public void init() {
         commands = new ArrayList<>();
@@ -53,8 +59,19 @@ public class TestsConversationHandler {
         Assertions.assertEquals(3, context.get("nextState"));
     }
 
+    // naming AAA A_B_C
     @Test
     public void checkMessageHandlerStateChange() throws Exception {
+        // Arange
+
+
+        // Act
+
+
+        // Assert
+
+
+
         var handler1 = new MessageHandler("abc", c -> {
             c.update("nextState", 1);
             return 1;

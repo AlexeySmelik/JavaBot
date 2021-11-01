@@ -169,7 +169,7 @@ public class DialogMaker {
         var chatId = (String) context.get("chatId");
         bot.print("Write a topic", chatId);
         var idx = 0;
-        for (var topic : bot.wordStore.getTopicsName()) {
+        for (var topic : bot.wordStore.getTopics()) {
             bot.print(idx + " - " + topic, chatId);
             idx += 1;
         }
@@ -179,8 +179,8 @@ public class DialogMaker {
     private static Integer printWordsToLearn(Context context) {
         var chatId = (String) context.get("chatId");
         var message = Integer.parseInt((String) context.get("message"));
-        var topic = bot.wordStore.getTopicsName().get(message);
-        if(bot.wordStore.getTopicsName().size() < message)
+        var topic = bot.wordStore.getTopics().get(message);
+        if(bot.wordStore.getTopics().size() < message)
         {
             bot.print("I don't have this topic", chatId);
             return 7;
