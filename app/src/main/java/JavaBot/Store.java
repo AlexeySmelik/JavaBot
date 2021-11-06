@@ -2,10 +2,10 @@ package JavaBot;
 
 import JavaBot.resources.WordAndTranslate;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface Store {
-    ArrayList<WordAndTranslate> get(String name);
-    void add(String topic, ArrayList<WordAndTranslate> tuple);
-    ArrayList<String> getTopics();
+    List<WordAndTranslate> get(String name);
+    void add(String topic, List<WordAndTranslate> tuple);
+    List<String> getTopics();
 }
