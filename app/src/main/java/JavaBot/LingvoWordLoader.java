@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -29,7 +30,7 @@ public class LingvoWordLoader implements Loader {
 
     public LingvoWordLoader(String key) {
         apiKey = key;
-        themes = Set.of("car");
+        themes = Set.of("car", "mother", "planet", "my", "weather", "home", "math");
         client = new OkHttpClient();
         try {
             setBearerToken();
@@ -87,8 +88,13 @@ public class LingvoWordLoader implements Loader {
 
         var gson = new Gson();
         var entity = gson.fromJson(response.body().string(), WordList.class);
-
-        return List.of();
+        var headings = entity.Headings;
+        var out = new ArrayList<WordAndTranslate>();
+        for (var heading : headings){
+            var wordAndTranslate = new WordAndTranslate(heading.Heading, heading.Translation);
+            out.add(wordAndTranslate);
+        }
+        return out;
     }
 
 
