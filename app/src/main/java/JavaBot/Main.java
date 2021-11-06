@@ -13,7 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class Main {
-    public static void main(String [] args) {
+    public static void main(String [] args) throws IOException {
+        var store1 = new WordStore();
         try {
             var config = getConfig();
 

@@ -17,7 +17,6 @@ dependencies {
     implementation 'org.mongodb:mongodb-driver-sync:4.3.3'
     implementation 'com.squareup.okhttp3:okhttp:4.1.0'
 }
-
 compileJava {options.encoding = "UTF-8"}
 
 application {
