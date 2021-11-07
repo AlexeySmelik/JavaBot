@@ -1,6 +1,6 @@
 package JavaBot;
 
-import JavaBot.resources.WordAndTranslate;
+import JavaBot.resources.Word;
 import JavaBot.resources.WordList;
 import com.google.gson.Gson;
 import okhttp3.*;
@@ -28,15 +28,11 @@ public class LingvoWordLoader implements Loader {
     private final OkHttpClient client;
     private String bearerToken;
 
-    public LingvoWordLoader(String key) {
+    public LingvoWordLoader(String key) throws IOException {
         apiKey = key;
         themes = Set.of("car", "mother", "planet", "my", "weather", "home", "math");
         client = new OkHttpClient();
-        try {
-            setBearerToken();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        setBearerToken();
     }
 
     private void setBearerToken() throws IOException {
@@ -59,7 +55,7 @@ public class LingvoWordLoader implements Loader {
         bearerToken = Objects.requireNonNull(response.body()).string();
     }
 
-    public List<WordAndTranslate> getWordsByPrefix(
+    public List<Word> getWordsByPrefix(
             String prefix,
             String srcLang,
             String dstLang
@@ -89,14 +85,13 @@ public class LingvoWordLoader implements Loader {
         var gson = new Gson();
         var entity = gson.fromJson(response.body().string(), WordList.class);
         var headings = entity.Headings;
-        var out = new ArrayList<WordAndTranslate>();
+        var out = new ArrayList<Word>();
         for (var heading : headings){
-            var wordAndTranslate = new WordAndTranslate(heading.Heading, heading.Translation);
+            var wordAndTranslate = new Word(heading.Heading, heading.Translation);
             out.add(wordAndTranslate);
         }
         return out;
     }
-
 
     @Override
     public void load(Store store) {

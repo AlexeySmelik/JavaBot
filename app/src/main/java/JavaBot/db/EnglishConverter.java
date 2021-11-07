@@ -1,16 +1,16 @@
 package JavaBot.db;
 
-import JavaBot.resources.WordAndTranslate;
+import JavaBot.resources.Word;
 
 public class EnglishConverter {
-    public static String ToString(WordAndTranslate couple) {
-        return couple.getWord() +
+    public static String ToString(Word couple) {
+        return couple.getHeading() +
                 ':' +
-                couple.getTranslate();
+                couple.getTranslation();
     }
 
-    public static WordAndTranslate ToCouple(String str) {
+    public static Word ToCouple(String str) {
         var res = str.split(":");
-        return new WordAndTranslate(res[0], res[1]);
+        return new Word(res[0], res[1]);
     }
 }

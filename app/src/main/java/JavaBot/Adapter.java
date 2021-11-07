@@ -2,17 +2,17 @@ package JavaBot;
 
 import java.util.ArrayList;
 import JavaBot.db.Operator;
-import JavaBot.resources.WordAndTranslate;
+import JavaBot.resources.Word;
 
 public class Adapter {
     public ArrayList<QuestionForm> getUserQuestions(
             Integer maxQuestions,
-            ArrayList<WordAndTranslate> showedWords,
+            ArrayList<Word> showedWords,
             String userId, WordStore wordStore,
             Operator operatorDb,
             String topic
     ) {
-        var wordsToAsk = new ArrayList<WordAndTranslate>();
+        var wordsToAsk = new ArrayList<Word>();
         for(var i = 0; i < showedWords.size() && wordsToAsk.size() < maxQuestions; i++) {
             wordsToAsk.add(showedWords.get(i));
         }
@@ -25,13 +25,12 @@ public class Adapter {
         return makeQuestions(wordsToAsk);
     }
 
-    private ArrayList<QuestionForm> makeQuestions(ArrayList<WordAndTranslate> words)
+    private ArrayList<QuestionForm> makeQuestions(ArrayList<Word> words)
     {
         var maxQuestions = words.size();
         var result = new ArrayList<QuestionForm>();
-        for(var i = 0; i < maxQuestions; i++) {
-            var word = words.get(i);
-            result.add(new QuestionForm(word.getTranslate(), word.getWord()));
+        for (Word word : words) {
+            result.add(new QuestionForm(word.getTranslation(), word.getHeading()));
         }
         return result;
     }

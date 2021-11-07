@@ -5,7 +5,7 @@ import JavaBot.handlers.State;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import JavaBot.resources.WordAndTranslate;
+import JavaBot.resources.Word;
 import JavaBot.resources.Context;
 import java.util.function.Function;
 import JavaBot.handlers.MessageHandler;
@@ -72,7 +72,7 @@ public class DialogMaker {
         var chatId = (String) context.get("chatId");
         context.update("questions", adapter.getUserQuestions(
                 maxQuestions,
-                (ArrayList<WordAndTranslate>)context.get("showedWords"),
+                (ArrayList<Word>)context.get("showedWords"),
                 chatId,
                 bot.wordStore,
                 bot.operatorDB,
@@ -84,7 +84,7 @@ public class DialogMaker {
         var chatId = (String) context.get("chatId");
         bot.print("Your learned words:", chatId);
         for(var word : bot.operatorDB.getWords(chatId))
-            bot.print(word.getWord(), chatId);
+            bot.print(word.getHeading(), chatId);
         bot.print("You can write: back - go to main state", chatId);
         return 3;
     }
@@ -114,13 +114,13 @@ public class DialogMaker {
         var question = questions.get((int)context.get("correctAnswers"));
         var attempts = (Integer)context.get("attempts");
         var topic = (String) context.get("topic");
-        var learnedByTopic = new ArrayList<WordAndTranslate>();
+        var learnedByTopic = new ArrayList<Word>();
         for(var e : bot.operatorDB.getWords(chatId)){
             if(bot.wordStore.get(topic).contains(e)){
                 learnedByTopic.add(e);
             }
         }
-        var word = new WordAndTranslate(question.answer, question.question);
+        var word = new Word(question.answer, question.question);
         if(context.get("message").equals(question.answer))
         {
             if(attempts == 0)
@@ -148,10 +148,10 @@ public class DialogMaker {
         return 5;
     }
 
-    private static void processLearnedWord(WordAndTranslate word, Context context){
+    private static void processLearnedWord(Word word, Context context){
         var chatId = (String) context.get("chatId");
-        var showed = (ArrayList<WordAndTranslate>)context.get("showedWords");
-        var list = new ArrayList<WordAndTranslate>();
+        var showed = (ArrayList<Word>)context.get("showedWords");
+        var list = new ArrayList<Word>();
         list.add(word);
         bot.operatorDB.updateWords(chatId, list);
         showed.remove(word);
@@ -186,7 +186,7 @@ public class DialogMaker {
             return 7;
         }
         bot.print("Words from topic: " + topic, chatId);
-        var newWords = new ArrayList<WordAndTranslate>();
+        var newWords = new ArrayList<Word>();
         for(var i = 0; i < bot.wordStore.get(topic).size() && newWords.size() < maxQuestions; i++){
             var word = bot.wordStore.get(topic).get(i);
             if(!bot.operatorDB.getWords(chatId).contains(word)){
@@ -194,7 +194,7 @@ public class DialogMaker {
             }
         }
         for(var e : newWords){
-            bot.print(e.getWord() + " - " + e.getTranslate(), chatId);
+            bot.print(e.getHeading() + " - " + e.getTranslation(), chatId);
         }
         context.update("showedWords", newWords);
         context.update("topic", topic);

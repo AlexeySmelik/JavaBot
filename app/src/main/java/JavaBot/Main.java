@@ -13,25 +13,19 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class Main {
-    public static void main(String [] args) throws IOException {
-        var store1 = new WordStore();
+    public static void main(String [] args) {
         try {
             var config = getConfig();
 
             var operator = new MongoDBOperator(config.uriMongoDB, config.dbName);
+
             var store = new WordStore();
             var loader = new LingvoWordLoader(config.extKey);
             loader.load(store);
 
             var botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(
-                    new EnglishWordStudyBot(
-                            config.token,
-                            config.botName,
-                            operator,
-                            store
-                    )
-            );
+            var bot = new EnglishWordStudyBot(config.token, config.botName, operator, store);
+            botsApi.registerBot(bot);
         } catch (Exception e) {
             e.printStackTrace();
         }

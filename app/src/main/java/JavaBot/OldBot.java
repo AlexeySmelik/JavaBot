@@ -4,7 +4,7 @@ import JavaBot.resources.Context;
 import JavaBot.handlers.ConversationHandler;
 import JavaBot.handlers.ConversationListener;
 import JavaBot.handlers.MessageHandler;
-import JavaBot.resources.WordAndTranslate;
+import JavaBot.resources.Word;
 
 import java.io.IOException;
 import java.util.*;
@@ -55,7 +55,7 @@ public class OldBot {
         data.put("questions", new ArrayList<QuestionForm>());
         data.put("topic", "");
         data.put("attempts", 0);
-        data.put("showedWords", new ArrayList<WordAndTranslate>());
+        data.put("showedWords", new ArrayList<Word>());
         return new Context(data);
     }
 }

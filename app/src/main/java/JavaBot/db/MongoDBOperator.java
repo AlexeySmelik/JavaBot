@@ -1,6 +1,6 @@
 package JavaBot.db;
 
-import JavaBot.resources.WordAndTranslate;
+import JavaBot.resources.Word;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClients;
@@ -38,7 +38,7 @@ public class MongoDBOperator implements Operator {
         }
     }
 
-    public List<WordAndTranslate> getWords(String userId) {
+    public List<Word> getWords(String userId) {
         var userCollection = database.getCollection("user_list");
         var filterDoc = new Document("_id", new Document("$regex", userId));
         var neededDoc = userCollection.find(filterDoc).first();
@@ -48,7 +48,7 @@ public class MongoDBOperator implements Operator {
         return res.stream().map(EnglishConverter::ToCouple).toList();
     }
 
-    public void updateWords(String userId, List<WordAndTranslate> newWords) {
+    public void updateWords(String userId, List<Word> newWords) {
         var userCollection = database.getCollection("user_list");
         var filterDoc = new Document("_id", new Document("$regex", userId));
         var wordStream = Stream.concat(getWords(userId).stream(), newWords.stream());

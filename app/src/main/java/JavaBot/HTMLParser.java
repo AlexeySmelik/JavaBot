@@ -1,6 +1,6 @@
 package JavaBot;
 
-import JavaBot.resources.WordAndTranslate;
+import JavaBot.resources.Word;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -47,10 +47,10 @@ public  class HTMLParser implements Loader {
         }
     }
 
-    private ArrayList<WordAndTranslate> getDictionaryForTheme(String link) throws IOException {
+    private ArrayList<Word> getDictionaryForTheme(String link) throws IOException {
         Document page = Jsoup.parse(new URL(link), 3000);
         Elements titles = page.select("tr");
-        var arrayOfWordAndTranslate = new ArrayList<WordAndTranslate>();
+        var arrayOfWordAndTranslate = new ArrayList<Word>();
         for (Element title : titles){
             String text = title.text();
             if (text.contains("[") & !text.contains(",")
@@ -59,7 +59,7 @@ public  class HTMLParser implements Loader {
                 int secondSpecialSymbol = text.indexOf("]");
                 var englishWord = text.substring(0, firstSpecialSymbol - 1);
                 var russianWord = text.substring(secondSpecialSymbol + 2);
-                var wordAndTranslate = new WordAndTranslate(englishWord, russianWord);
+                var wordAndTranslate = new Word(englishWord, russianWord);
                 arrayOfWordAndTranslate.add(wordAndTranslate);
             }
         }
