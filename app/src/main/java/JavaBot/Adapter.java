@@ -3,6 +3,7 @@ package JavaBot;
 import java.util.ArrayList;
 import JavaBot.db.Operator;
 import JavaBot.resources.Word;
+import JavaBot.resources.WordStore;
 
 public class Adapter {
     public ArrayList<QuestionForm> getUserQuestions(

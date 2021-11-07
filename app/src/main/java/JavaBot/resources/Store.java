@@ -1,4 +1,4 @@
-package JavaBot;
+package JavaBot.resources;
 
 import JavaBot.resources.Word;
 

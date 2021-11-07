@@ -1,4 +1,4 @@
-package JavaBot.resources;
+package JavaBot.deserialization;
 
 import java.util.List;
 

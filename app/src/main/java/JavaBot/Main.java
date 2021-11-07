@@ -1,7 +1,9 @@
 package JavaBot;
 
 import JavaBot.db.MongoDBOperator;
-import JavaBot.resources.Config;
+import JavaBot.deserialization.Config;
+import JavaBot.resources.LingvoWordLoader;
+import JavaBot.resources.WordStore;
 import com.google.gson.Gson;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;

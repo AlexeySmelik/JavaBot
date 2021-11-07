@@ -1,4 +1,4 @@
-package JavaBot.resources;
+package JavaBot.deserialization;
 
 public class Config {
     public String botName;

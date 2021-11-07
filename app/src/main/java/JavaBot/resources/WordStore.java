@@ -1,6 +1,4 @@
-package JavaBot;
-
-import JavaBot.resources.Word;
+package JavaBot.resources;
 
 import java.util.ArrayList;
 import java.util.HashMap;

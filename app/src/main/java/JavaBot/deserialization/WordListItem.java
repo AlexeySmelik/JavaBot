@@ -1,4 +1,4 @@
-package JavaBot.resources;
+package JavaBot.deserialization;
 
 public class WordListItem {
     public String Heading;
