@@ -60,8 +60,8 @@ public class DialogMaker {
     private static Integer printStatistic(Context context) {
         var chatId = (String) context.get("chatId");
         var result = bot.operatorDB.getWords(chatId).size();
-        bot.print("Learned words: " + result, chatId);
-        bot.print("You can write: back - go to main state", chatId);
+        bot.print("Learned words: " + result, chatId, 2);
+        bot.print("You can write: back - go to main state", chatId, 2);
         return 2;
     }
 
@@ -82,10 +82,10 @@ public class DialogMaker {
 
     private static Integer printLearnedWords(Context context) {
         var chatId = (String) context.get("chatId");
-        bot.print("Your learned words:", chatId);
+        bot.print("Your learned words:", chatId, 1);
         for(var word : bot.operatorDB.getWords(chatId))
-            bot.print(word.getHeading(), chatId);
-        bot.print("You can write: back - go to main state", chatId);
+            bot.print(word.getHeading(), chatId, 2);
+        bot.print("You can write: back - go to main state", chatId, 3);
         return 3;
     }
 
@@ -93,7 +93,7 @@ public class DialogMaker {
     private static Integer askWord(Context context) {
         var chatId = (String) context.get("chatId");
         var questions = (ArrayList<QuestionForm>)context.get("questions");
-        bot.print(questions.get((Integer)context.get("correctAnswers")).question, chatId);
+        bot.print(questions.get((Integer)context.get("correctAnswers")).question, chatId, 5);
         return 5;
     }
 
@@ -104,7 +104,7 @@ public class DialogMaker {
                 statistic - print statistic of your learned words\s
                 dictionary - print all your learned words\s
                 learn - show you new english words\s
-                revise - start a test to revise words which have been shown earlier""", chatId);
+                revise - start a test to revise words which have been shown earlier""", chatId, 1);
         return 1;
     }
 
@@ -126,7 +126,7 @@ public class DialogMaker {
             if(attempts == 0)
                 processLearnedWord(word, context);
             context.update("correctAnswers", (int)context.get("correctAnswers") + 1);
-            bot.print("Correct", chatId);
+            bot.print("Correct", chatId, 3);
             context.update("attempts", 0);
             if((int)context.get("correctAnswers") != maxQuestions)
                 return askWord(context);
@@ -135,14 +135,14 @@ public class DialogMaker {
         {
             context.update("attempts", 1);
             question.UpdateHint();
-            bot.print(question.hint, chatId);
+            bot.print(question.hint, chatId, 3);
         }
         if((int)context.get("correctAnswers") == maxQuestions)
         {
             bot.print("""
                         You can write:\s
                         back - go to main state
-                        again - learn new words""", chatId);
+                        again - learn new words""", chatId, 6);
             return 6;
         }
         return 5;
@@ -158,19 +158,19 @@ public class DialogMaker {
     }
 
 
-    private static Integer back(Context context) {
+    public static Integer back(Context context) {
         var chatId = (String) context.get("chatId");
-        bot.print("You are in main state, bro...", chatId);
+        bot.print("You are in main state, bro...", chatId, 1);
 
         return 1;
     }
 
     private static Integer learnWords(Context context) {
         var chatId = (String) context.get("chatId");
-        bot.print("Write a topic", chatId);
+        bot.print("Write a topic", chatId, 3);
         var idx = 0;
         for (var topic : bot.wordStore.getTopics()) {
-            bot.print(idx + " - " + topic, chatId);
+            bot.print(idx + " - " + topic, chatId, 3);
             idx += 1;
         }
         return 7;
@@ -182,10 +182,10 @@ public class DialogMaker {
         var topic = bot.wordStore.getTopics().get(message);
         if(bot.wordStore.getTopics().size() < message)
         {
-            bot.print("I don't have this topic", chatId);
+            bot.print("I don't have this topic", chatId, 3);
             return 7;
         }
-        bot.print("Words from topic: " + topic, chatId);
+        bot.print("Words from topic: " + topic, chatId, 3);
         var newWords = new ArrayList<Word>();
         for(var i = 0; i < bot.wordStore.get(topic).size() && newWords.size() < maxQuestions; i++){
             var word = bot.wordStore.get(topic).get(i);
@@ -194,7 +194,7 @@ public class DialogMaker {
             }
         }
         for(var e : newWords){
-            bot.print(e.getHeading() + " - " + e.getTranslation(), chatId);
+            bot.print(e.getHeading() + " - " + e.getTranslation(), chatId, 3);
         }
         context.update("showedWords", newWords);
         context.update("topic", topic);
@@ -202,7 +202,7 @@ public class DialogMaker {
                 You can write:\s
                 test - start test to revise english words
                 back - go to main state
-                again - learn some new words""", chatId);
+                again - learn some new words""", chatId, 8);
         return 8;
     }
 }

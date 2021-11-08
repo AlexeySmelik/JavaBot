@@ -14,6 +14,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class EnglishWordStudyBot extends TelegramLongPollingBot {
     public final Operator operatorDB;
@@ -37,16 +38,17 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
         }
     }
 
-    public void print(String text, String chatId) {
+    public void print(String text, String chatId, Integer state) {
         var message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);
         var markupInline = new ReplyKeyboardMarkup();
         var rows = new ArrayList<KeyboardRow>();
         var row = new KeyboardRow();
-        var button = new KeyboardButton();
-        button.setText("help");
-        row.add(button);
+        for (var e : GetButtons(state))
+        {
+            row.add(e);
+        }
         rows.add(row);
         markupInline.setKeyboard(rows);
         message.setReplyMarkup(markupInline);
@@ -56,6 +58,57 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+
+    private ArrayList<KeyboardButton> GetButtons(Integer state)
+    {
+        var result = new ArrayList<KeyboardButton>();
+        switch (state) {
+            case 1 -> {
+                var button = new KeyboardButton();
+                button.setText("dictionary");
+                var button2 = new KeyboardButton();
+                button2.setText("learn");
+                var button3 = new KeyboardButton();
+                button3.setText("revise");
+                var button4 = new KeyboardButton();
+                button4.setText("statistic");
+                result.add(button);
+                result.add(button2);
+                result.add(button3);
+                result.add(button4);
+                break;
+            }
+            case 2, 3, 5 -> {
+                var button = new KeyboardButton();
+                button.setText("back");
+                result.add(button);
+                break;
+            }
+            case 6 -> {
+                var button = new KeyboardButton();
+                button.setText("again");
+                var button2 = new KeyboardButton();
+                button2.setText("back");
+                result.add(button);
+                result.add(button2);
+                break;
+            }
+            case 8 -> {
+                var button = new KeyboardButton();
+                button.setText("test");
+                var button2 = new KeyboardButton();
+                button2.setText("back");
+                var button3 = new KeyboardButton();
+                button3.setText("again");
+                result.add(button);
+                result.add(button2);
+                result.add(button3);
+
+                break;
+            }
+        }
+        return result;
     }
 
     @Override

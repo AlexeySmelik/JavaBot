@@ -5,6 +5,7 @@ import JavaBot.handlers.ConversationHandler;
 import JavaBot.handlers.ConversationListener;
 import JavaBot.handlers.MessageHandler;
 import JavaBot.resources.Word;
+import JavaBot.resources.Word;
 
 import java.io.IOException;
 import java.util.*;
@@ -33,6 +34,7 @@ public class OldBot {
         commands.add(new MessageHandler("/help", DialogMaker::help));
         commands.add(new MessageHandler("help", DialogMaker::help));
         commands.add(new MessageHandler("/start", DialogMaker::help));
+        commands.add(new MessageHandler("start", DialogMaker::back));
         try {
             var states = DialogMaker.makeDialog(bot);
             var convHandler = new ConversationHandler(commands, states, 1);
