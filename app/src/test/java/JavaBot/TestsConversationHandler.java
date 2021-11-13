@@ -1,6 +1,6 @@
 package JavaBot;
 
-import JavaBot.resources.Context;
+import JavaBot.data_classes.Context;
 import JavaBot.handlers.ConversationHandler;
 import JavaBot.handlers.MessageHandler;
 import JavaBot.handlers.State;

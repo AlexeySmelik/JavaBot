@@ -1,5 +1,8 @@
-package JavaBot.resources;
+package JavaBot;
 
+import JavaBot.data_classes.Loader;
+import JavaBot.data_classes.Store;
+import JavaBot.data_classes.Word;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

@@ -1,7 +1,8 @@
 package JavaBot;
 
-import JavaBot.db.Operator;
-import JavaBot.resources.WordStore;
+import JavaBot.db.User;
+import JavaBot.db.UserRepository;
+import JavaBot.data_classes.Store;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -14,26 +15,29 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class EnglishWordStudyBot extends TelegramLongPollingBot {
-    public final Operator operatorDB;
     private final String botToken;
     private final String botName;
-    public final WordStore wordStore;
+    public final Store wordStore;
+    public final UserRepository userStore;
     private OldBot old;
 
-    public EnglishWordStudyBot(String botToken, String botName, Operator operator, WordStore store) {
+    public EnglishWordStudyBot(
+            String botToken,
+            String botName,
+            Store store,
+            UserRepository repository
+    ) {
         super();
         this.botToken = botToken;
         this.botName = botName;
         this.wordStore = store;
-        this.operatorDB = operator;
+        this.userStore = repository;
         try {
             old = new OldBot(this);
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -126,7 +130,7 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             var chatId = update.getMessage().getChatId().toString();
-            operatorDB.add(chatId);
+            userStore.save(new User(chatId, null), false);
             var message = update.getMessage().getText();
             try {
                 old.tryAddNewUser(chatId);

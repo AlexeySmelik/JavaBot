@@ -1,16 +1,17 @@
 package JavaBot;
 
 import java.util.ArrayList;
-import JavaBot.db.Operator;
-import JavaBot.resources.Word;
-import JavaBot.resources.WordStore;
+
+import JavaBot.db.UserRepository;
+import JavaBot.data_classes.Store;
+import JavaBot.data_classes.Word;
 
 public class Adapter {
     public ArrayList<QuestionForm> getUserQuestions(
             Integer maxQuestions,
             ArrayList<Word> showedWords,
-            String userId, WordStore wordStore,
-            Operator operatorDb,
+            String userId, Store wordStore,
+            UserRepository repository,
             String topic
     ) {
         var wordsToAsk = new ArrayList<Word>();
@@ -19,7 +20,7 @@ public class Adapter {
         }
         for(var i = 0; i < wordStore.get(topic).size() && wordsToAsk.size() < maxQuestions; i++){
             var word = wordStore.get(topic).get(i);
-            if(!operatorDb.getWords(userId).contains(word)){
+            if(!repository.get(userId).learnedWords.contains(word)){
                 wordsToAsk.add(word);
             }
         }

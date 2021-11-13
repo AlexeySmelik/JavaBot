@@ -1,6 +1,6 @@
 package JavaBot.db;
 
-import JavaBot.resources.Word;
+import JavaBot.data_classes.Word;
 
 public class EnglishConverter {
     public static String ToString(Word couple) {

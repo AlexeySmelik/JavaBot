@@ -1,6 +1,4 @@
-package JavaBot.resources;
-
-import JavaBot.resources.Word;
+package JavaBot.data_classes;
 
 import java.util.List;
 

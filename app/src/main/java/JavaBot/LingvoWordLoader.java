@@ -1,6 +1,9 @@
-package JavaBot.resources;
+package JavaBot;
 
 import JavaBot.deserialization.WordList;
+import JavaBot.data_classes.Loader;
+import JavaBot.data_classes.Store;
+import JavaBot.data_classes.Word;
 import com.google.gson.Gson;
 import okhttp3.*;
 

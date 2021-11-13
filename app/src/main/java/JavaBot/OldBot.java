@@ -1,11 +1,10 @@
 package JavaBot;
 
-import JavaBot.resources.Context;
+import JavaBot.data_classes.Context;
 import JavaBot.handlers.ConversationHandler;
 import JavaBot.handlers.ConversationListener;
 import JavaBot.handlers.MessageHandler;
-import JavaBot.resources.Word;
-import JavaBot.resources.Word;
+import JavaBot.data_classes.Word;
 
 import java.io.IOException;
 import java.util.*;
@@ -34,7 +33,7 @@ public class OldBot {
         commands.add(new MessageHandler("/help", DialogMaker::help));
         commands.add(new MessageHandler("help", DialogMaker::help));
         commands.add(new MessageHandler("/start", DialogMaker::help));
-        commands.add(new MessageHandler("start", DialogMaker::back));
+        commands.add(new MessageHandler("back", DialogMaker::back));
         try {
             var states = DialogMaker.makeDialog(bot);
             var convHandler = new ConversationHandler(commands, states, 1);
@@ -47,7 +46,7 @@ public class OldBot {
         return true;
     }
 
-    private Context getDefaultContext(String chatId) throws IOException {
+    private Context getDefaultContext(String chatId) {
         var data = new HashMap<String, Object>();
         var adapter = new Adapter();
         data.put("chatId", chatId);

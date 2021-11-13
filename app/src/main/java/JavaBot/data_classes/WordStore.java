@@ -1,4 +1,4 @@
-package JavaBot.resources;
+package JavaBot.data_classes;
 
 import java.util.ArrayList;
 import java.util.HashMap;

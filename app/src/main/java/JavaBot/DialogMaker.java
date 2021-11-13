@@ -4,9 +4,10 @@ import JavaBot.handlers.State;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import JavaBot.resources.Word;
-import JavaBot.resources.Context;
+import JavaBot.data_classes.Word;
+import JavaBot.data_classes.Context;
 import java.util.function.Function;
 import JavaBot.handlers.MessageHandler;
 
@@ -59,7 +60,7 @@ public class DialogMaker {
 
     private static Integer printStatistic(Context context) {
         var chatId = (String) context.get("chatId");
-        var result = bot.operatorDB.getWords(chatId).size();
+        var result = bot.userStore.get(chatId).learnedWords.size();
         bot.print("Learned words: " + result, chatId, 2);
         bot.print("You can write: back - go to main state", chatId, 2);
         return 2;
@@ -75,7 +76,7 @@ public class DialogMaker {
                 (ArrayList<Word>)context.get("showedWords"),
                 chatId,
                 bot.wordStore,
-                bot.operatorDB,
+                bot.userStore,
                 (String)context.get("topic")));
         return askWord(context);
     }
@@ -83,7 +84,7 @@ public class DialogMaker {
     private static Integer printLearnedWords(Context context) {
         var chatId = (String) context.get("chatId");
         bot.print("Your learned words:", chatId, 1);
-        for(var word : bot.operatorDB.getWords(chatId))
+        for(var word : bot.userStore.get(chatId).learnedWords)
             bot.print(word.getHeading(), chatId, 2);
         bot.print("You can write: back - go to main state", chatId, 3);
         return 3;
@@ -115,7 +116,7 @@ public class DialogMaker {
         var attempts = (Integer)context.get("attempts");
         var topic = (String) context.get("topic");
         var learnedByTopic = new ArrayList<Word>();
-        for(var e : bot.operatorDB.getWords(chatId)){
+        for(var e : bot.userStore.get(chatId).learnedWords){
             if(bot.wordStore.get(topic).contains(e)){
                 learnedByTopic.add(e);
             }
@@ -151,9 +152,9 @@ public class DialogMaker {
     private static void processLearnedWord(Word word, Context context){
         var chatId = (String) context.get("chatId");
         var showed = (ArrayList<Word>)context.get("showedWords");
-        var list = new ArrayList<Word>();
-        list.add(word);
-        bot.operatorDB.updateWords(chatId, list);
+        var user = bot.userStore.get(chatId);
+        user.updateLearnedWords(List.of(word));
+        bot.userStore.save(user, true);
         showed.remove(word);
     }
 
@@ -189,7 +190,7 @@ public class DialogMaker {
         var newWords = new ArrayList<Word>();
         for(var i = 0; i < bot.wordStore.get(topic).size() && newWords.size() < maxQuestions; i++){
             var word = bot.wordStore.get(topic).get(i);
-            if(!bot.operatorDB.getWords(chatId).contains(word)){
+            if(!bot.userStore.get(chatId).learnedWords.contains(word)){
                 newWords.add(word);
             }
         }

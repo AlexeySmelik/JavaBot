@@ -1,4 +1,4 @@
-package JavaBot.resources;
+package JavaBot.data_classes;
 
 public class Word {
     private final String heading;

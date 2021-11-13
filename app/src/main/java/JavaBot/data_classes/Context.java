@@ -1,4 +1,4 @@
-package JavaBot.resources;
+package JavaBot.data_classes;
 
 import JavaBot.handlers.ContextEventManager;
 import JavaBot.handlers.EventListener;

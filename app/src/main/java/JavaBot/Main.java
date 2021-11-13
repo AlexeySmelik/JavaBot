@@ -1,9 +1,9 @@
 package JavaBot;
 
 import JavaBot.db.MongoDBOperator;
+import JavaBot.db.MongoDBRepository;
 import JavaBot.deserialization.Config;
-import JavaBot.resources.LingvoWordLoader;
-import JavaBot.resources.WordStore;
+import JavaBot.data_classes.WordStore;
 import com.google.gson.Gson;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -19,14 +19,20 @@ public class Main {
         try {
             var config = getConfig();
 
-            var operator = new MongoDBOperator(config.uriMongoDB, config.dbName);
+            var database = MongoDBOperator.InitializeDatabase(config.uriMongoDB, config.dbName);
+            var repository = new MongoDBRepository(database);
 
             var store = new WordStore();
             var loader = new LingvoWordLoader(config.extKey);
             loader.load(store);
 
             var botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            var bot = new EnglishWordStudyBot(config.token, config.botName, operator, store);
+            var bot = new EnglishWordStudyBot(
+                    config.token,
+                    config.botName,
+                    store,
+                    repository
+            );
             botsApi.registerBot(bot);
         } catch (Exception e) {
             e.printStackTrace();
