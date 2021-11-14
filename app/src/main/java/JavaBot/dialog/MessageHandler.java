@@ -1,6 +1,4 @@
-package JavaBot.handlers;
-
-import JavaBot.data_classes.Context;
+package JavaBot.dialog;
 
 import java.util.function.Function;
 import java.util.regex.Pattern;

@@ -1,4 +1,4 @@
-package JavaBot.handlers;
+package JavaBot.dialog;
 
 public interface EventManager<TSource> {
     void add(String eventType, EventListener<TSource> listener);

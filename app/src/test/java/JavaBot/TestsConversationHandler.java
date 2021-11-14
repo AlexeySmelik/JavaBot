@@ -1,9 +1,9 @@
 package JavaBot;
 
-import JavaBot.data_classes.Context;
-import JavaBot.handlers.ConversationHandler;
-import JavaBot.handlers.MessageHandler;
-import JavaBot.handlers.State;
+import JavaBot.dialog.Context;
+import JavaBot.dialog.ConversationHandler;
+import JavaBot.dialog.MessageHandler;
+import JavaBot.dialog.State;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;

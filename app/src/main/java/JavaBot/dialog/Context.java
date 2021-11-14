@@ -1,8 +1,4 @@
-package JavaBot.data_classes;
-
-import JavaBot.handlers.ContextEventManager;
-import JavaBot.handlers.EventListener;
-import JavaBot.handlers.EventManager;
+package JavaBot.dialog;
 
 import java.util.ArrayList;
 import java.util.HashSet;

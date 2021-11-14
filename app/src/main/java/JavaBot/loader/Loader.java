@@ -1,4 +1,6 @@
-package JavaBot.data_classes;
+package JavaBot.loader;
+
+import JavaBot.data_classes.Store;
 
 import java.io.IOException;
 

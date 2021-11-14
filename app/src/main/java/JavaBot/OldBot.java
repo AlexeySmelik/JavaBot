@@ -1,9 +1,9 @@
 package JavaBot;
 
-import JavaBot.data_classes.Context;
-import JavaBot.handlers.ConversationHandler;
-import JavaBot.handlers.ConversationListener;
-import JavaBot.handlers.MessageHandler;
+import JavaBot.dialog.Context;
+import JavaBot.dialog.ConversationHandler;
+import JavaBot.dialog.ConversationListener;
+import JavaBot.dialog.MessageHandler;
 import JavaBot.data_classes.Word;
 
 import java.io.IOException;
