@@ -1,16 +1,16 @@
 package JavaBot;
 
 import JavaBot.data_classes.DialogState;
-import JavaBot.handlers.State;
+import JavaBot.dialog.State;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import JavaBot.data_classes.Word;
-import JavaBot.data_classes.Context;
+import JavaBot.dialog.Context;
 import java.util.function.Function;
-import JavaBot.handlers.MessageHandler;
+import JavaBot.dialog.MessageHandler;
 
 public class DialogMaker {
     private static final Integer maxQuestions = 2;
@@ -70,7 +70,7 @@ public class DialogMaker {
     private static Integer startTest(Context context) {
         context.update("correctAnswers", 0);
         context.update("attempts", 0);
-        var adapter = (Adapter)context.get("adapter");
+        var adapter = (Adapter) context.get("adapter");
         var chatId = (String) context.get("chatId");
         context.update("questions", adapter.getUserQuestions(
                 maxQuestions,

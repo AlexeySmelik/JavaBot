@@ -4,6 +4,7 @@ import JavaBot.db.MongoDBOperator;
 import JavaBot.db.MongoDBRepository;
 import JavaBot.deserialization.Config;
 import JavaBot.data_classes.WordStore;
+import JavaBot.loader.LingvoLoader;
 import com.google.gson.Gson;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -23,7 +24,7 @@ public class Main {
             var repository = new MongoDBRepository(database);
 
             var store = new WordStore();
-            var loader = new LingvoWordLoader(config.extKey);
+            var loader = new LingvoLoader(config.extKey);
             loader.load(store);
 
             var botsApi = new TelegramBotsApi(DefaultBotSession.class);

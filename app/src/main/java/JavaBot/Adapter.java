@@ -18,18 +18,19 @@ public class Adapter {
         for(var i = 0; i < showedWords.size() && wordsToAsk.size() < maxQuestions; i++) {
             wordsToAsk.add(showedWords.get(i));
         }
+        /*
         for(var i = 0; i < wordStore.get(topic).size() && wordsToAsk.size() < maxQuestions; i++){
             var word = wordStore.get(topic).get(i);
             if(!repository.get(userId).learnedWords.contains(word)){
                 wordsToAsk.add(word);
             }
         }
+        */
         return makeQuestions(wordsToAsk);
     }
 
     private ArrayList<QuestionForm> makeQuestions(ArrayList<Word> words)
     {
-        var maxQuestions = words.size();
         var result = new ArrayList<QuestionForm>();
         for (Word word : words) {
             result.add(new QuestionForm(word.getTranslation(), word.getHeading()));

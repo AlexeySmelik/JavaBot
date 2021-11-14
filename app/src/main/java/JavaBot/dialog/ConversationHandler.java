@@ -1,6 +1,5 @@
-package JavaBot.handlers;
+package JavaBot.dialog;
 
-import JavaBot.data_classes.Context;
 import java.util.List;
 import java.util.Map;
 
