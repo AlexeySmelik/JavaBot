@@ -1,5 +1,6 @@
 package JavaBot;
 
+import JavaBot.data_classes.DialogState;
 import JavaBot.handlers.State;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class DialogMaker {
     public static HashMap<Integer, State> makeDialog(EnglishWordStudyBot bot) {
         DialogMaker.bot = bot;
         var states = new HashMap<Integer, State>();
-        states.put(1,
+        states.put(DialogState.MainState.ordinal(),
                 makeState(
                         new HashMap<>(Map.of(
                                 "statistic", DialogMaker::printStatistic,
@@ -26,23 +27,23 @@ public class DialogMaker {
                                 "revise", DialogMaker::startTest,
                                 "learn", DialogMaker::learnWords)),
                         null));
-        states.put(2,
+        states.put(DialogState.PrintingStatistic.ordinal(),
                 makeState(new HashMap<>(Map.of("back", DialogMaker::back)),
                         null));
-        states.put(3,
+        states.put(DialogState.PrintingLearnedWords.ordinal(),
                 makeState(new HashMap<>(Map.of("back", DialogMaker::back)),
                         null));
-        states.put(5,
+        states.put(DialogState.AskingUserWord.ordinal(),
                 makeState(new HashMap<>(), DialogMaker::checkWord));
-        states.put(6,
+        states.put(DialogState.FinishingTest.ordinal(),
                 makeState(
                         new HashMap<>(Map.of(
                                 "again", DialogMaker::startTest,
                                 "back", DialogMaker::back)),
                         null));
-        states.put(7,
+        states.put(DialogState.PrintingWordsToLearn.ordinal(),
                 makeState(new HashMap<>(), DialogMaker::printWordsToLearn));
-        states.put(8,
+        states.put(DialogState.FinishingPrintingNewWords.ordinal(),
                 makeState(
                         new HashMap<>(Map.of(
                                 "again", DialogMaker::learnWords,
@@ -61,9 +62,9 @@ public class DialogMaker {
     private static Integer printStatistic(Context context) {
         var chatId = (String) context.get("chatId");
         var result = bot.userStore.get(chatId).learnedWords.size();
-        bot.print("Learned words: " + result, chatId, 2);
-        bot.print("You can write: back - go to main state", chatId, 2);
-        return 2;
+        bot.print("Learned words: " + result, chatId, DialogState.PrintingStatistic);
+        bot.print("You can write: back - go to main state", chatId, DialogState.PrintingStatistic);
+        return DialogState.PrintingStatistic.ordinal();
     }
 
     private static Integer startTest(Context context) {
@@ -83,19 +84,19 @@ public class DialogMaker {
 
     private static Integer printLearnedWords(Context context) {
         var chatId = (String) context.get("chatId");
-        bot.print("Your learned words:", chatId, 1);
+        bot.print("Your learned words:", chatId, DialogState.PrintingLearnedWords);
         for(var word : bot.userStore.get(chatId).learnedWords)
-            bot.print(word.getHeading(), chatId, 2);
-        bot.print("You can write: back - go to main state", chatId, 3);
-        return 3;
+            bot.print(word.getHeading(), chatId, DialogState.PrintingLearnedWords);
+        bot.print("You can write: back - go to main state", chatId, DialogState.PrintingLearnedWords);
+        return DialogState.PrintingLearnedWords.ordinal();
     }
 
 
     private static Integer askWord(Context context) {
         var chatId = (String) context.get("chatId");
         var questions = (ArrayList<QuestionForm>)context.get("questions");
-        bot.print(questions.get((Integer)context.get("correctAnswers")).question, chatId, 5);
-        return 5;
+        bot.print(questions.get((Integer)context.get("correctAnswers")).question, chatId, DialogState.AskingUserWord);
+        return DialogState.AskingUserWord.ordinal();
     }
 
     public static Integer help(Context context){
@@ -105,8 +106,8 @@ public class DialogMaker {
                 statistic - print statistic of your learned words\s
                 dictionary - print all your learned words\s
                 learn - show you new english words\s
-                revise - start a test to revise words which have been shown earlier""", chatId, 1);
-        return 1;
+                revise - start a test to revise words which have been shown earlier""", chatId, DialogState.MainState);
+        return DialogState.MainState.ordinal();
     }
 
     private static Integer checkWord(Context context) {
@@ -127,7 +128,7 @@ public class DialogMaker {
             if(attempts == 0)
                 processLearnedWord(word, context);
             context.update("correctAnswers", (int)context.get("correctAnswers") + 1);
-            bot.print("Correct", chatId, 3);
+            bot.print("Correct", chatId, DialogState.AskingUserWord);
             context.update("attempts", 0);
             if((int)context.get("correctAnswers") != maxQuestions)
                 return askWord(context);
@@ -136,17 +137,17 @@ public class DialogMaker {
         {
             context.update("attempts", 1);
             question.UpdateHint();
-            bot.print(question.hint, chatId, 3);
+            bot.print(question.hint, chatId, DialogState.AskingUserWord);
         }
         if((int)context.get("correctAnswers") == maxQuestions)
         {
             bot.print("""
                         You can write:\s
                         back - go to main state
-                        again - learn new words""", chatId, 6);
-            return 6;
+                        again - learn new words""", chatId, DialogState.FinishingTest);
+            return DialogState.FinishingTest.ordinal();
         }
-        return 5;
+        return DialogState.AskingUserWord.ordinal();
     }
 
     private static void processLearnedWord(Word word, Context context){
@@ -161,20 +162,20 @@ public class DialogMaker {
 
     public static Integer back(Context context) {
         var chatId = (String) context.get("chatId");
-        bot.print("You are in main state, bro...", chatId, 1);
+        bot.print("You are in main state, bro...", chatId, DialogState.MainState);
 
-        return 1;
+        return DialogState.MainState.ordinal();
     }
 
     private static Integer learnWords(Context context) {
         var chatId = (String) context.get("chatId");
-        bot.print("Write a topic", chatId, 3);
+        bot.print("Write a topic", chatId, DialogState.PrintingWordsToLearn);
         var idx = 0;
         for (var topic : bot.wordStore.getTopics()) {
-            bot.print(idx + " - " + topic, chatId, 3);
+            bot.print(idx + " - " + topic, chatId, DialogState.PrintingWordsToLearn);
             idx += 1;
         }
-        return 7;
+        return DialogState.PrintingWordsToLearn.ordinal();
     }
 
     private static Integer printWordsToLearn(Context context) {
@@ -183,10 +184,10 @@ public class DialogMaker {
         var topic = bot.wordStore.getTopics().get(message);
         if(bot.wordStore.getTopics().size() < message)
         {
-            bot.print("I don't have this topic", chatId, 3);
-            return 7;
+            bot.print("I don't have this topic", chatId, DialogState.PrintingWordsToLearn);
+            return DialogState.PrintingWordsToLearn.ordinal();
         }
-        bot.print("Words from topic: " + topic, chatId, 3);
+        bot.print("Words from topic: " + topic, chatId, DialogState.PrintingWordsToLearn);
         var newWords = new ArrayList<Word>();
         for(var i = 0; i < bot.wordStore.get(topic).size() && newWords.size() < maxQuestions; i++){
             var word = bot.wordStore.get(topic).get(i);
@@ -195,7 +196,7 @@ public class DialogMaker {
             }
         }
         for(var e : newWords){
-            bot.print(e.getHeading() + " - " + e.getTranslation(), chatId, 3);
+            bot.print(e.getHeading() + " - " + e.getTranslation(), chatId, DialogState.PrintingWordsToLearn);
         }
         context.update("showedWords", newWords);
         context.update("topic", topic);
@@ -203,8 +204,8 @@ public class DialogMaker {
                 You can write:\s
                 test - start test to revise english words
                 back - go to main state
-                again - learn some new words""", chatId, 8);
-        return 8;
+                again - learn some new words""", chatId, DialogState.FinishingPrintingNewWords);
+        return DialogState.FinishingPrintingNewWords.ordinal();
     }
 }
 
