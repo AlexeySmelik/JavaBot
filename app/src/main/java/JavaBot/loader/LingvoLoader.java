@@ -17,7 +17,7 @@ public class LingvoLoader implements Loader {
         }
     }
 
-    private final LingvoWordApi wordApi;
+    private final WordApi wordApi;
     private final Set<String> themes;
 
 
