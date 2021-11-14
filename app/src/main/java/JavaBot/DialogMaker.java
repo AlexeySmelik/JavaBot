@@ -72,13 +72,15 @@ public class DialogMaker {
         context.update("attempts", 0);
         var adapter = (Adapter) context.get("adapter");
         var chatId = (String) context.get("chatId");
+        var showedWords = (ArrayList<Word>)context.get("showedWords");
+        if(showedWords == null || showedWords.size() == 0)
+        {
+            bot.print("You have no words to revise", chatId, DialogState.FinishingTest);
+        }
+
         context.update("questions", adapter.getUserQuestions(
                 maxQuestions,
-                (ArrayList<Word>)context.get("showedWords"),
-                chatId,
-                bot.wordStore,
-                bot.userStore,
-                (String)context.get("topic")));
+                (ArrayList<Word>)context.get("showedWords")));
         return askWord(context);
     }
 
@@ -90,7 +92,6 @@ public class DialogMaker {
         bot.print("You can write: back - go to main state", chatId, DialogState.PrintingLearnedWords);
         return DialogState.PrintingLearnedWords.ordinal();
     }
-
 
     private static Integer askWord(Context context) {
         var chatId = (String) context.get("chatId");
@@ -130,7 +131,7 @@ public class DialogMaker {
             context.update("correctAnswers", (int)context.get("correctAnswers") + 1);
             bot.print("Correct", chatId, DialogState.AskingUserWord);
             context.update("attempts", 0);
-            if((int)context.get("correctAnswers") != maxQuestions)
+            if((int)context.get("correctAnswers") != questions.size())
                 return askWord(context);
         }
         else
@@ -139,7 +140,7 @@ public class DialogMaker {
             question.UpdateHint();
             bot.print(question.hint, chatId, DialogState.AskingUserWord);
         }
-        if((int)context.get("correctAnswers") == maxQuestions)
+        if((int)context.get("correctAnswers") == questions.size())
         {
             bot.print("""
                         You can write:\s
@@ -158,7 +159,6 @@ public class DialogMaker {
         bot.userStore.save(user, true);
         showed.remove(word);
     }
-
 
     public static Integer back(Context context) {
         var chatId = (String) context.get("chatId");
@@ -208,4 +208,3 @@ public class DialogMaker {
         return DialogState.FinishingPrintingNewWords.ordinal();
     }
 }
-
