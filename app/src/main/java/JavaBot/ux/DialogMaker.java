@@ -1,5 +1,7 @@
-package JavaBot;
+package JavaBot.ux;
 
+import JavaBot.EnglishWordStudyBot;
+import JavaBot.Strings;
 import JavaBot.data_classes.DialogState;
 import JavaBot.dialog.State;
 
@@ -22,33 +24,32 @@ public class DialogMaker {
         states.put(DialogState.MainState.ordinal(),
                 makeState(
                         new HashMap<>(Map.of(
-                                "statistic", DialogMaker::printStatistic,
-                                "dictionary", DialogMaker::printLearnedWords,
-                                "revise", DialogMaker::startTest,
-                                "learn", DialogMaker::learnWords)),
+                                Strings.statistic.string, DialogMaker::printStatistic,
+                                Strings.dictionary.string, DialogMaker::printLearnedWords,
+                                Strings.revise.string, DialogMaker::startTest,
+                                Strings.learn.string, DialogMaker::learnWords)),
                         null));
         states.put(DialogState.PrintingStatistic.ordinal(),
-                makeState(new HashMap<>(Map.of("back", DialogMaker::back)),
+                makeState(new HashMap<>(Map.of(Strings.back.string, DialogMaker::back)),
                         null));
         states.put(DialogState.PrintingLearnedWords.ordinal(),
-                makeState(new HashMap<>(Map.of("back", DialogMaker::back)),
+                makeState(new HashMap<>(Map.of(Strings.back.string, DialogMaker::back)),
                         null));
         states.put(DialogState.AskingUserWord.ordinal(),
                 makeState(new HashMap<>(), DialogMaker::checkWord));
         states.put(DialogState.FinishingTest.ordinal(),
                 makeState(
                         new HashMap<>(Map.of(
-                                "again", DialogMaker::startTest,
-                                "back", DialogMaker::back)),
+                                Strings.back.string, DialogMaker::back)),
                         null));
         states.put(DialogState.PrintingWordsToLearn.ordinal(),
                 makeState(new HashMap<>(), DialogMaker::printWordsToLearn));
         states.put(DialogState.FinishingPrintingNewWords.ordinal(),
                 makeState(
                         new HashMap<>(Map.of(
-                                "again", DialogMaker::learnWords,
-                                "test", DialogMaker::startTest,
-                                "back", DialogMaker::back)),
+                                Strings.again.string, DialogMaker::learnWords,
+                                Strings.test.string, DialogMaker::startTest,
+                                Strings.back.string, DialogMaker::back)),
                         null));
         return states;
     }
@@ -74,9 +75,7 @@ public class DialogMaker {
         var chatId = (String) context.get("chatId");
         var showedWords = (ArrayList<Word>)context.get("showedWords");
         if(showedWords == null || showedWords.size() == 0)
-        {
             bot.print("You have no words to revise", chatId, DialogState.FinishingTest);
-        }
 
         context.update("questions", adapter.getUserQuestions(
                 maxQuestions,
@@ -89,7 +88,7 @@ public class DialogMaker {
         bot.print("Your learned words:", chatId, DialogState.PrintingLearnedWords);
         for(var word : bot.userStore.get(chatId).learnedWords)
             bot.print(word.getHeading(), chatId, DialogState.PrintingLearnedWords);
-        bot.print("You can write: back - go to main state", chatId, DialogState.PrintingLearnedWords);
+        bot.print(Strings.printBack.string, chatId, DialogState.PrintingLearnedWords);
         return DialogState.PrintingLearnedWords.ordinal();
     }
 
@@ -102,12 +101,7 @@ public class DialogMaker {
 
     public static Integer help(Context context){
         var chatId = (String) context.get("chatId");
-        bot.print("""
-                In main state you can write these messages:\s
-                statistic - print statistic of your learned words\s
-                dictionary - print all your learned words\s
-                learn - show you new english words\s
-                revise - start a test to revise words which have been shown earlier""", chatId, DialogState.MainState);
+        bot.print(Strings.helpMessage.string, chatId, DialogState.MainState);
         return DialogState.MainState.ordinal();
     }
 
@@ -142,10 +136,7 @@ public class DialogMaker {
         }
         if((int)context.get("correctAnswers") == questions.size())
         {
-            bot.print("""
-                        You can write:\s
-                        back - go to main state
-                        again - learn new words""", chatId, DialogState.FinishingTest);
+            bot.print(Strings.printBackOrAgain.string, chatId, DialogState.FinishingTest);
             return DialogState.FinishingTest.ordinal();
         }
         return DialogState.AskingUserWord.ordinal();
@@ -162,7 +153,7 @@ public class DialogMaker {
 
     public static Integer back(Context context) {
         var chatId = (String) context.get("chatId");
-        bot.print("You are in main state, bro...", chatId, DialogState.MainState);
+        bot.print(Strings.mainMenuMessage.string, chatId, DialogState.MainState);
 
         return DialogState.MainState.ordinal();
     }
@@ -200,11 +191,7 @@ public class DialogMaker {
         }
         context.update("showedWords", newWords);
         context.update("topic", topic);
-        bot.print("""
-                You can write:\s
-                test - start test to revise english words
-                back - go to main state
-                again - learn some new words""", chatId, DialogState.FinishingPrintingNewWords);
+        bot.print(Strings.printTestOrBackOrAgain.string, chatId, DialogState.FinishingPrintingNewWords);
         return DialogState.FinishingPrintingNewWords.ordinal();
     }
 }

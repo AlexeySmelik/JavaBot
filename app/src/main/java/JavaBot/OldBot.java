@@ -5,6 +5,9 @@ import JavaBot.dialog.ConversationHandler;
 import JavaBot.dialog.ConversationListener;
 import JavaBot.dialog.MessageHandler;
 import JavaBot.data_classes.Word;
+import JavaBot.ux.Adapter;
+import JavaBot.ux.DialogMaker;
+import JavaBot.ux.QuestionForm;
 
 import java.io.IOException;
 import java.util.*;

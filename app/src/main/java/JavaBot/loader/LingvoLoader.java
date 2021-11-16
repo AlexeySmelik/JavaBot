@@ -1,5 +1,6 @@
 package JavaBot.loader;
 
+import JavaBot.api.WordApi;
 import JavaBot.data_classes.Store;
 
 import java.io.IOException;
@@ -20,10 +21,9 @@ public class LingvoLoader implements Loader {
     private final WordApi wordApi;
     private final Set<String> themes;
 
-
-    public LingvoLoader(String key) throws IOException {
-        wordApi = new LingvoWordApi(key);
-        themes = Set.of("car", "planet", "my", "weather", "home", "math");
+    public LingvoLoader(WordApi wordApi) {
+        this.wordApi = wordApi;
+        themes = Set.of("planet", "my", "weather", "home", "math");
     }
 
     @Override

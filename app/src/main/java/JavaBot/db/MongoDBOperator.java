@@ -1,5 +1,6 @@
 package JavaBot.db;
 
+import JavaBot.Strings;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClients;
@@ -15,9 +16,9 @@ public class MongoDBOperator {
         var mongoClient = MongoClients.create(settings);
         var database = mongoClient.getDatabase(name);
         try {
-            database.createCollection("user_list");
+            database.createCollection(Strings.collectionName.string);
         } catch (Exception e) {
-            System.out.println("There is a user_list collection");
+            System.out.printf("There is a user_list collection%n");
         }
         return database;
     }

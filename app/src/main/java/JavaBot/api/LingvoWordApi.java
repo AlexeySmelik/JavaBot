@@ -1,4 +1,4 @@
-package JavaBot.loader;
+package JavaBot.api;
 
 import JavaBot.data_classes.Word;
 import JavaBot.deserialization.WordList;

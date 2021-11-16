@@ -1,10 +1,11 @@
 package JavaBot;
 
 import JavaBot.db.MongoDBOperator;
-import JavaBot.db.MongoDBRepository;
+import JavaBot.db.UserRepository;
 import JavaBot.deserialization.Config;
 import JavaBot.data_classes.WordStore;
 import JavaBot.loader.LingvoLoader;
+import JavaBot.api.LingvoWordApi;
 import com.google.gson.Gson;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
@@ -21,10 +22,11 @@ public class Main {
             var config = getConfig();
 
             var database = MongoDBOperator.InitializeDatabase(config.uriMongoDB, config.dbName);
-            var repository = new MongoDBRepository(database);
+            var repository = new UserRepository(database);
 
             var store = new WordStore();
-            var loader = new LingvoLoader(config.extKey);
+            var wordApi = new LingvoWordApi(config.extKey);
+            var loader = new LingvoLoader(wordApi);
             loader.load(store);
 
             var botsApi = new TelegramBotsApi(DefaultBotSession.class);

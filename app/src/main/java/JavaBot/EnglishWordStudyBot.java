@@ -2,8 +2,9 @@ package JavaBot;
 
 import JavaBot.data_classes.DialogState;
 import JavaBot.db.User;
-import JavaBot.db.UserRepository;
+import JavaBot.db.IUserRepository;
 import JavaBot.data_classes.Store;
+import JavaBot.ux.ButtonsMaker;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -20,14 +21,14 @@ public class EnglishWordStudyBot extends TelegramLongPollingBot {
     private final String botToken;
     private final String botName;
     public final Store wordStore;
-    public final UserRepository userStore;
+    public final IUserRepository userStore;
     private OldBot old;
 
     public EnglishWordStudyBot(
             String botToken,
             String botName,
             Store store,
-            UserRepository repository
+            IUserRepository repository
     ) {
         super();
         this.botToken = botToken;

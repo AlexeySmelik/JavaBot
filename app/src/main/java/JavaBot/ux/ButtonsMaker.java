@@ -1,5 +1,6 @@
-package JavaBot;
+package JavaBot.ux;
 
+import JavaBot.Strings;
 import JavaBot.data_classes.DialogState;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 
@@ -13,20 +14,17 @@ public class ButtonsMaker {
         var buttonsTexts = new ArrayList<String>();
         switch (currentState) {
             case MainState -> {
-                buttonsTexts.add("dictionary");
-                buttonsTexts.add("learn");
-                buttonsTexts.add("revise");
-                buttonsTexts.add("statistic");
+                buttonsTexts.add(Strings.dictionary.string);
+                buttonsTexts.add(Strings.learn.string);
+                buttonsTexts.add(Strings.revise.string);
+                buttonsTexts.add(Strings.statistic.string);
             }
-            case PrintingStatistic, PrintingLearnedWords, AskingUserWord, PrintingWordsToLearn -> buttonsTexts.add("back");
-            case FinishingTest -> {
-                buttonsTexts.add("again");
-                buttonsTexts.add("back");
-            }
+            case PrintingStatistic, PrintingLearnedWords, AskingUserWord, PrintingWordsToLearn, FinishingTest ->
+                buttonsTexts.add(Strings.back.string);
             case FinishingPrintingNewWords -> {
-                buttonsTexts.add("test");
-                buttonsTexts.add("back");
-                buttonsTexts.add("again");
+                buttonsTexts.add(Strings.test.string);
+                buttonsTexts.add(Strings.back.string);
+                buttonsTexts.add(Strings.again.string);
             }
         }
 

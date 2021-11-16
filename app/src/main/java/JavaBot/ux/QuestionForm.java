@@ -1,4 +1,4 @@
-package JavaBot;
+package JavaBot.ux;
 
 public class QuestionForm {
     public String question;

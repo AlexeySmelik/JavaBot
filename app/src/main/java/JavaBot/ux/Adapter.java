@@ -1,9 +1,7 @@
-package JavaBot;
+package JavaBot.ux;
 
 import java.util.ArrayList;
 
-import JavaBot.db.UserRepository;
-import JavaBot.data_classes.Store;
 import JavaBot.data_classes.Word;
 
 public class Adapter {
