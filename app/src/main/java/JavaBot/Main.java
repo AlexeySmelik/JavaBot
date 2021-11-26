@@ -19,20 +19,18 @@ import java.nio.file.Files;
 public class Main {
     public static void main(String [] args) {
         try {
-            var config = getConfig();
-
-            var database = MongoDBOperator.InitializeDatabase(config.uriMongoDB, config.dbName);
+            var database = MongoDBOperator.InitializeDatabase(Config.uriMongoDB, Config.dbName);
             var repository = new UserRepository(database);
 
             var store = new WordStore();
-            var wordApi = new LingvoWordApi(config.extKey);
+            var wordApi = new LingvoWordApi(Config.extKey);
             var loader = new LingvoLoader(wordApi);
             loader.load(store);
 
             var botsApi = new TelegramBotsApi(DefaultBotSession.class);
             var bot = new EnglishWordStudyBot(
-                    config.token,
-                    config.botName,
+                    Config.token,
+                    Config.botName,
                     store,
                     repository
             );
@@ -40,14 +38,5 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private static Config getConfig() throws IOException, URISyntaxException {
-        var configURL = ClassLoader.getSystemClassLoader().getResource("config.json");
-        assert configURL != null;
-        var file = new File(configURL.toURI());
-        var lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
-        var gson = new Gson();
-        return gson.fromJson(String.join("", lines), Config.class);
     }
 }
